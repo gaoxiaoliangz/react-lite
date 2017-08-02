@@ -4,11 +4,12 @@ function main() {
 
   // game env
   const gravity = 1.2
-  const bgVX = -10
-  const obstacleGap = 80
-  const obstacleWidth = 30
+  const obstacleGap = 380
+  const obstacleWidth = 60
+  const obstacleVerGap = 120
 
   // game state
+  let bgVX = -5
   let ganmeOver = false
   let obstacles = []
 
@@ -16,14 +17,17 @@ function main() {
     x: canvas.width * 0.3,
     y: canvas.height * 0.5,
     vx: 0,
-    vy: 0
+    vy: 0,
+    w: 50,
+    h: 50
   }
 
   init()
 
-  function makeObstacle(pos, x) {
+  function makeObstacle(x) {
+    const pos = 0.2 + Math.random() * 0.6
     const w = obstacleWidth
-    const gap = 30
+    const verGap = obstacleVerGap
     const topH = canvas.height * pos
 
     const top = {
@@ -33,10 +37,10 @@ function main() {
       y: 0
     }
     const bottom = {
-      h: canvas.height - topH - gap,
+      h: canvas.height - topH - verGap,
       w,
       x,
-      y: topH + gap
+      y: topH + verGap
     }
     return { top, bottom }
   }
@@ -47,16 +51,25 @@ function main() {
     window.addEventListener('keyup', handleKeyUp)
 
     for (let i = 0; i < 10; i++) {
-      obstacles.push(makeObstacle(Math.random(), i * obstacleGap + canvas.width * 0.5))
+      obstacles.push(makeObstacle(i * obstacleGap + canvas.width * 0.5))
     }
   }
 
-  function updateFrame() {
-    // update bird position
-    box.x += box.vx
-    box.y += box.vy
+  function isOverlab(a, b) {
+    return a.x > b.x && a.x < b.x + b.w && a.y > b.y && a.y < b.y + b.h
+  }
 
-    box.vy += gravity
+  function updateFrame() {
+    // game over
+    if (ganmeOver) {
+      bgVX = 0
+    } else {
+      // update bird position
+      box.x += box.vx
+      box.y += box.vy
+
+      box.vy += gravity
+    }
 
     // fill bg
     context.fillStyle = 'gray'
@@ -64,22 +77,28 @@ function main() {
 
     // place bird
     context.fillStyle = 'white'
-    context.fillRect(box.x, box.y, 20, 20)
+    context.fillRect(box.x, box.y, box.w, box.h)
 
     // place obstacles
     obstacles.forEach((obstacle, index) => {
       context.fillRect(obstacle.top.x, obstacle.top.y, obstacle.top.w, obstacle.top.h)
       context.fillRect(obstacle.bottom.x, obstacle.bottom.y, obstacle.bottom.w, obstacle.bottom.h)
 
+      // determine if game is over
+      if (isOverlab(box, obstacle.top) || isOverlab(box, obstacle.bottom)) {
+        ganmeOver = true
+      }
+
       obstacles[index].bottom.x += bgVX
       obstacles[index].top.x += bgVX
     })
 
+    // add obstacle
     const obstaclesCount = obstacles.length
     const lastObstacle = obstacles[obstaclesCount - 1]
     const maxObsCount = Math.round(canvas.width / (obstacleWidth + obstacleGap)) + 2
     if (lastObstacle.top.x + obstacleWidth <= 800 && obstaclesCount <= maxObsCount) {
-      obstacles.push(makeObstacle(Math.random(), lastObstacle.top.x + obstacleGap))
+      obstacles.push(makeObstacle(lastObstacle.top.x + obstacleGap))
     }
 
     // release off-screen obstacles
@@ -90,7 +109,7 @@ function main() {
 
   function handleKeyDown(e) {
     if (e.key === ' ') {
-      box.vy = -10
+      box.vy = -12
     }
   }
 
