@@ -4,10 +4,13 @@ function main() {
 
   // game env
   const gravity = 1.2
+  const bgVX = -10
+  const obstacleGap = 80
+  const obstacleWidth = 30
 
   // game state
   let ganmeOver = false
-  const obstacles = []
+  let obstacles = []
 
   const box = {
     x: canvas.width * 0.3,
@@ -19,7 +22,7 @@ function main() {
   init()
 
   function makeObstacle(pos, x) {
-    const w = 30
+    const w = obstacleWidth
     const gap = 30
     const topH = canvas.height * pos
 
@@ -44,7 +47,7 @@ function main() {
     window.addEventListener('keyup', handleKeyUp)
 
     for (let i = 0; i < 10; i++) {
-      obstacles.push(makeObstacle(Math.random(), i * 80 + canvas.width * 0.5))
+      obstacles.push(makeObstacle(Math.random(), i * obstacleGap + canvas.width * 0.5))
     }
   }
 
@@ -64,9 +67,24 @@ function main() {
     context.fillRect(box.x, box.y, 20, 20)
 
     // place obstacles
-    obstacles.forEach(obstacle => {
+    obstacles.forEach((obstacle, index) => {
       context.fillRect(obstacle.top.x, obstacle.top.y, obstacle.top.w, obstacle.top.h)
       context.fillRect(obstacle.bottom.x, obstacle.bottom.y, obstacle.bottom.w, obstacle.bottom.h)
+
+      obstacles[index].bottom.x += bgVX
+      obstacles[index].top.x += bgVX
+    })
+
+    const obstaclesCount = obstacles.length
+    const lastObstacle = obstacles[obstaclesCount - 1]
+    const maxObsCount = Math.round(canvas.width / (obstacleWidth + obstacleGap)) + 2
+    if (lastObstacle.top.x + obstacleWidth <= 800 && obstaclesCount <= maxObsCount) {
+      obstacles.push(makeObstacle(Math.random(), lastObstacle.top.x + obstacleGap))
+    }
+
+    // release off-screen obstacles
+    obstacles = obstacles.filter(obs => {
+      return obs.top.x + obstacleWidth > 0
     })
   }
 
