@@ -8,7 +8,7 @@
 
 一个简单的，不可 compose 的 observable
 
-### simple platformer
+### platformer
 
 一个简单的平台游戏实现，随机生成游戏场景，可以移动游戏角色。
 
