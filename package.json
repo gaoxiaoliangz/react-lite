@@ -1,0 +1,23 @@
+{
+  "name": "virtual-dom-lite",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "watch": "parcel watch index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gaoxiaoliangz/virtual-dom-lite.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gaoxiaoliangz/virtual-dom-lite/issues"
+  },
+  "homepage": "https://github.com/gaoxiaoliangz/virtual-dom-lite#readme",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
+}
