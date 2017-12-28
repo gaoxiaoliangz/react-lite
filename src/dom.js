@@ -1,13 +1,17 @@
 import _ from 'lodash'
 
 /**
- * 
+ * vdomToDom
  * @param {Object} vdom
  * @param {String | Function} vdom.type
  * @param {Object} vdom.props
- * @param {{} | []} vdom.props.children
+ * @param {{} | [] | String} vdom.props.children
  */
 function vdomToDom(vdom) {
+  if (!vdom) {
+    console.warn('Empty vdom found', vdom)
+    return
+  }
   if (typeof vdom === 'string') {
     const text = document.createTextNode(vdom)
     return text
@@ -16,11 +20,15 @@ function vdomToDom(vdom) {
   if (typeof type === 'string') {
     const dom = document.createElement(type)
     const attrs = _.omit(props, ['children', 'onClick'])
+    if (props.onClick) {
+      dom.addEventListener('click', props.onClick)
+    }
     _.forEach(attrs, (v, k) => {
       dom.setAttribute(k, v)
     })
     const children = Array.isArray(props.children) ? props.children : [props.children]
     children
+      .filter(Boolean)
       .map(child => vdomToDom(child))
       .forEach(child => {
         dom.appendChild(child)
@@ -32,7 +40,7 @@ function vdomToDom(vdom) {
     return vdomToDom(type(props))
   }
   console.warn('Invalid type found', type)
-  return ''
+  return
 }
 
 export function render(vdom, mountTarget) {

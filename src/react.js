@@ -20,7 +20,8 @@ export class Component {
 
   setState(state, cb) {
     this.state = state
-    cb()
+    console.log('setstate', state)
+    if (cb) cb()
   }
 }
 
