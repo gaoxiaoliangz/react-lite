@@ -1,9 +1,11 @@
-import Wrap from './wrap'
+// import React from 'react'
+import React from '../../src'
+// import Wrap from './wrap'
 
 export default (props) => {
   return (
-    <Wrap>
+    <div className="btn">
       <div>{props.children}</div>
-    </Wrap>
+    </div>
   )
 }
