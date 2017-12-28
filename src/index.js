@@ -1,3 +1,6 @@
-import _ from 'lodash'
+import React from './react'
+import { render } from './dom'
 
-console.log(_.isArray([]))
+export * from './react'
+export { render }
+export default React
