@@ -8,12 +8,14 @@ import _ from 'lodash'
  * @param {{} | [] | String} vdom.props.children
  */
 function vdomToDom(vdom) {
-  if (!vdom) {
-    console.warn('Empty vdom found', vdom)
-    return
-  }
-  if (typeof vdom === 'string') {
-    const text = document.createTextNode(vdom)
+  if (typeof vdom === 'undefined' || typeof vdom === 'string' || typeof vdom === 'number' || vdom === null) {
+    let str
+    try {
+      str = vdom.toString()
+    } catch (error) {
+      str = vdom
+    }
+    const text = document.createTextNode(str)
     return text
   }
   const { type, props } = vdom
@@ -24,18 +26,28 @@ function vdomToDom(vdom) {
       dom.addEventListener('click', props.onClick)
     }
     _.forEach(attrs, (v, k) => {
-      dom.setAttribute(k, v)
+      const key = k === 'className' ? 'class' : k
+      dom.setAttribute(key, v)
     })
     const children = Array.isArray(props.children) ? props.children : [props.children]
-    children
-      .filter(Boolean)
-      .map(child => vdomToDom(child))
+    _.flattenDeep(children)
+      .map(child => {
+        return vdomToDom(child)
+      })
       .forEach(child => {
         dom.appendChild(child)
       })
     return dom
   } else if (type.__type === 'class-component') {
-    return new vdomToDom((new type(props)).render())
+    const compIns = new type(props)
+    const dom = vdomToDom(compIns.render())
+    compIns.setWatcher(() => {
+      console.log('update request')
+      const newDom = vdomToDom(compIns.render())
+      console.log(newDom)
+      dom.innerHTML = newDom.innerHTML
+    })
+    return dom
   } else if (typeof type === 'function') {
     return vdomToDom(type(props))
   }

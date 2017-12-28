@@ -1,50 +1,106 @@
+import _ from 'lodash'
+
 export default (React, Component, isFb = false) => {
   const container = () => {
-    class Abc extends Component {
-      constructor(props) {
-        super(props)
-        console.log('Abc constructor called')
-        this.state = {
-          clicked: false
-        }
-      }
-  
-      handleClick() {
-        this.setState({
-          clicked: true
-        })
-      }
-  
-      render() {
-        return <div onClick={this.handleClick.bind(this)}>
-          <p>{this.props.label}</p>
-          {this.state.clicked ? 'clicked' : 'not clicked'}
-        </div>
-      }
-    }
-  
-  
-    const App = () => {
+
+    const Button = (props) => {
       return (
-        <ul className="ul" abc="1212">
-          <Abc label="this is a label" />
-          <li>2</li>
-        </ul>
+        <div className="btn" onClick={props.onClick}>
+          <button>{props.children}</button>
+        </div>
       )
     }
-  
-    const App2 = () => {
-      return <Abc label="this is a label"/>
+
+    const TestContainer = ({ desc, children }) => {
+      return (
+        <div className="test-container">
+          <h3>{desc}</h3>
+          {children}
+        </div>
+      )
     }
-  
-    const App3 = () => {
-      return <ul>
-        <li>1</li>
-        <li>2</li>
-      </ul>
+
+    class ClickCounter extends Component {
+      constructor(props) {
+        super(props)
+        this.state = {
+          clicked: 0
+        }
+      }
+
+      add(step) {
+        return () => {
+          this.setState({
+            clicked: this.state.clicked + step
+          })
+        }
+      }
+
+      render() {
+        return (
+          <div onClick={this.add(1)}>
+            <p>clicked: {this.state.clicked}</p>
+            <p>Click div to update num</p>
+          </div>
+        )
+      }
     }
-  
-    return App3
+
+    const Test1 = () => {
+      return (
+        <TestContainer desc="Should render number correctly">
+          <ul>
+            {_.times(5).map(n => <li key={n}>{n}</li>)}
+          </ul>
+        </TestContainer>
+      )
+    }
+
+    class Test2 extends Component {
+      constructor(props) {
+        super(props)
+        this.state = {
+          clicked: 0
+        }
+      }
+
+      add(step) {
+        return () => {
+          this.setState({
+            clicked: this.state.clicked + step
+          })
+        }
+      }
+
+      render() {
+        return (
+          <TestContainer desc="Should render class component correctly and respond to clicks">
+            <p>clicked: {this.state.clicked}</p>
+            <div onClick={this.add(1)}>Add One</div>
+            <Button onClick={this.add(9)}>Add Nine</Button>
+          </TestContainer>
+        )
+      }
+    }
+
+    const Test3 = () => {
+      return (
+        <TestContainer desc="Should update num correctly">
+          <ClickCounter />
+        </TestContainer>
+      )
+    }
+
+    const App = () => {
+      return (
+        <div>
+          <Test1 />
+          <Test2 />
+          <Test3 />
+        </div>
+      )
+    }
+    return App
   }
 
   const beforeRun = () => {

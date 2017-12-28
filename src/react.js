@@ -18,9 +18,14 @@ export class Component {
     this.props = props
   }
 
+  setWatcher(cb) {
+    this.watcherCb = cb
+  }
+
   setState(state, cb) {
     this.state = state
-    console.log('setstate', state)
+    console.log('setState', state)
+    this.watcherCb()
     if (cb) cb()
   }
 }
