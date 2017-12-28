@@ -1,5 +1,6 @@
-import Main from './main'
+import React from './react'
 import { render } from './dom'
 
+export * from './main'
 export { render }
-export default Main
+export default React
