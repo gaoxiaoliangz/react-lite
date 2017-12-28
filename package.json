@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel index.html",
-    "watch": "parcel watch index.html"
+    "start": "npm run example:simple",
+    "example:simple": "parcel examples/simple/index.html"
   },
   "repository": {
     "type": "git",
