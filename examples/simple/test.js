@@ -1,4 +1,28 @@
 import _ from 'lodash'
+import { Provider } from 'react-redux'
+import { createStore, combineReducers } from 'redux'
+import { connect } from 'react-redux'
+
+const updateCount = count => {
+  return {
+    type: 'update-count',
+    payload: count
+  }
+}
+
+const reducers = combineReducers({
+  count: (state = 0, action) => {
+    switch (action.type) {
+      case 'update-count':
+        return action.payload
+
+      default:
+        return state
+    }
+  }
+})
+
+const store = createStore(reducers)
 
 export default (React, Component, isFb = false) => {
   const container = () => {
@@ -39,7 +63,7 @@ export default (React, Component, isFb = false) => {
       render() {
         return (
           <div onClick={this.add(1)}>
-            <p>clicked: {this.state.clicked}</p>
+            <p>clicks: {this.state.clicked}</p>
             <p>Click div to update num</p>
           </div>
         )
@@ -75,7 +99,7 @@ export default (React, Component, isFb = false) => {
       render() {
         return (
           <TestContainer desc="Should render class component correctly and respond to clicks">
-            <p>clicked: {this.state.clicked}</p>
+            <p>clicks: {this.state.clicked}</p>
             <div onClick={this.add(1)}>Add One</div>
             <Button onClick={this.add(9)}>Add Nine</Button>
           </TestContainer>
@@ -91,13 +115,65 @@ export default (React, Component, isFb = false) => {
       )
     }
 
-    const App = () => {
+    const UpdateCountWithRedux = connect(
+      (state, ownProps) => {
+        return {
+          count: state.count
+        }
+      },
+      { updateCount }
+    )((props) => {
       return (
         <div>
-          <Test1 />
-          <Test2 />
-          <Test3 />
+          <p>clicks: {props.count}</p>
+          <Button onClick={() => {
+            props.updateCount(props.count + 1)
+          }}>Add 1</Button>
         </div>
+      )
+    })
+
+    class Test4 extends Component {
+      componentWillMount() {
+        store.subscribe(() => {
+          this.setState({})
+        })
+      }
+
+      render() {
+        const currentCount = store.getState().count
+        return (
+          <TestContainer desc="should work fine with raw redux">
+            <div>
+              <p>clicks: {currentCount}</p>
+              <Button onClick={() => {
+                store.dispatch(updateCount(currentCount + 1))
+              }}>Add 1</Button>
+            </div>
+          </TestContainer>
+        )
+      }
+    }
+
+    const Test5 = () => {
+      return (
+        <TestContainer desc="should work fine with react redux">
+          <UpdateCountWithRedux />
+        </TestContainer>
+      )
+    }
+
+    const App = () => {
+      return (
+        <Provider store={store}>
+          <div>
+            <Test1 />
+            <Test2 />
+            <Test3 />
+            <Test4 />
+            <Test5 />
+          </div>
+        </Provider>
       )
     }
     return App

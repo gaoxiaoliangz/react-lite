@@ -7,7 +7,7 @@ import _ from 'lodash'
  * @param {Object} vdom.props
  * @param {{} | [] | String} vdom.props.children
  */
-function vdomToDom(vdom) {
+const vdomToDom = vdom => {
   if (typeof vdom === 'undefined' || typeof vdom === 'string' || typeof vdom === 'number' || vdom === null) {
     let str
     try {
@@ -23,7 +23,11 @@ function vdomToDom(vdom) {
     const dom = document.createElement(type)
     const attrs = _.omit(props, ['children', 'onClick'])
     if (props.onClick) {
-      dom.addEventListener('click', props.onClick)
+      dom.addEventListener('click', () => {
+        console.log('clicked')
+        props.onClick()
+      })
+      console.log('setup click for', dom)
     }
     _.forEach(attrs, (v, k) => {
       const key = k === 'className' ? 'class' : k
@@ -46,9 +50,12 @@ function vdomToDom(vdom) {
       const newDom = vdomToDom(compIns.render())
       console.log(newDom)
       dom.innerHTML = newDom.innerHTML
+      // document.getElementById('root3').appendChild(newDom)
+      document.getElementById('root3').innerHTML = newDom.innerHTML
     })
     return dom
   } else if (typeof type === 'function') {
+    console.log(type)
     return vdomToDom(type(props))
   }
   console.warn('Invalid type found', type)
