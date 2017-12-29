@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { Provider } from 'react-redux'
 import { createStore, combineReducers } from 'redux'
 import { connect } from 'react-redux'
+import { guid } from './utils'
 
 const updateCount = count => {
   return {
@@ -37,7 +38,7 @@ export default (React, Component, isFb = false) => {
 
     const TestContainer = ({ desc, children }) => {
       return (
-        <div className="test-container">
+        <div id={'test-' + guid()} className="test-container">
           <h3>{desc}</h3>
           {children}
         </div>
@@ -163,17 +164,34 @@ export default (React, Component, isFb = false) => {
       )
     }
 
+    // return (
+    //   <Provider store={store}>
+    //     <div>
+    //       <Test1 />
+    //       <Test2 />
+    //       <Test3 />
+    //       {/* <Test4 />
+    //       <Test5 /> */}
+    //     </div>
+    //   </Provider>
+    // )
     const App = () => {
       return (
-        <Provider store={store}>
-          <div>
-            <Test1 />
-            <Test2 />
-            <Test3 />
-            <Test4 />
-            <Test5 />
-          </div>
-        </Provider>
+        <div>
+          <Test1 />
+          <Test2 />
+          <Test3 />
+          <TestContainer desc="render text nodes">
+            <div>
+              aa
+              bb
+              cc
+              {'dd'}
+            </div>
+          </TestContainer>
+          {/* <Test4 />
+          <Test5 /> */}
+        </div>
       )
     }
     return App

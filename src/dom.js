@@ -1,5 +1,13 @@
 import _ from 'lodash'
 
+// TODO: a more general way to detect
+function isClassComponent(v) {
+  if (typeof v !== 'function') {
+    return false
+  }
+  return v.__type === 'class-component'
+}
+
 /**
  * vdomToDom
  * @param {Object} vdom
@@ -18,6 +26,7 @@ const vdomToDom = vdom => {
     const text = document.createTextNode(str)
     return text
   }
+
   const { type, props } = vdom
   if (typeof type === 'string') {
     const dom = document.createElement(type)
@@ -42,9 +51,11 @@ const vdomToDom = vdom => {
         dom.appendChild(child)
       })
     return dom
-  } else if (type.__type === 'class-component') {
+  } else if (isClassComponent(type)) {
     const compIns = new type(props)
     const dom = vdomToDom(compIns.render())
+    
+    // magic happens here
     compIns.setWatcher(() => {
       console.log('update request')
       const newDom = vdomToDom(compIns.render())
@@ -53,9 +64,9 @@ const vdomToDom = vdom => {
       // document.getElementById('root3').appendChild(newDom)
       document.getElementById('root3').innerHTML = newDom.innerHTML
     })
+
     return dom
   } else if (typeof type === 'function') {
-    console.log(type)
     return vdomToDom(type(props))
   }
   console.warn('Invalid type found', type)
@@ -64,6 +75,7 @@ const vdomToDom = vdom => {
 
 export function render(vdom, mountTarget) {
   const dom = vdomToDom(vdom)
+  // TODO
   mountTarget.innerHTML = ''
   mountTarget.append(dom)
 }
