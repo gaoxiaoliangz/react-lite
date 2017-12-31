@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-let expandedVdom
+let evaledVdom
 
 export function guid() {
   const s4 = () => {
@@ -20,19 +20,19 @@ function isClassComponent(v) {
 }
 
 /**
- * expandVDom
+ * evalVdom
  * @param {Object} vdom
  * @param {String | Function} vdom.type
  * @param {Object} vdom.props
  * @param {{} | [] | String} vdom.props.children
  */
-function expandVDom(vdom) {
+function evalVdom(vdom) {
   if (typeof vdom === 'undefined' || typeof vdom === 'string' || typeof vdom === 'number' || vdom === null) {
     let str
     try {
       str = vdom.toString()
     } catch (error) {
-      console.warn('Expand vdom', error)
+      console.warn('Eval vdom', error)
       str = vdom || ''
     }
     return str
@@ -46,20 +46,20 @@ function expandVDom(vdom) {
       props: {
         ...props,
         children: _.flattenDeep(children).map(child => {
-          const expanded = expandVDom(child)
-          return typeof expanded === 'object'
+          const evaled = evalVdom(child)
+          return typeof evaled === 'object'
             ? {
-              ...expanded,
+              ...evaled,
               parent: vdom
             }
-            : expanded
+            : evaled
         })
       },
-      uuid: guid()
+      // uuid: guid()
     }
   } else if (isClassComponent(type)) {
     const compIns = new type(props)
-    const expanded = expandVDom(compIns.render())
+    const evaled = evalVdom(compIns.render())
 
     // // magic happens here
     compIns.setWatcher(() => {
@@ -68,22 +68,22 @@ function expandVDom(vdom) {
 
     return {
       ...vdom,
-      expanded,
-      uuid: guid()
+      evaled,
+      // uuid: guid()
     }
   } else if (typeof type === 'function') {
-    const expanded = expandVDom(type(props))
+    const evaled = evalVdom(type(props))
     return {
       ...vdom,
-      expanded,
-      uuid: guid()
+      evaled,
+      // uuid: guid()
     }
   }
   console.warn('Invalid type found', type)
   return
 }
 
-const createDomFromExpandedVdom = vdom => {
+const createDomFromEvaledVdom = vdom => {
   if (typeof vdom === 'string') {
     return document.createTextNode(vdom)
   }
@@ -104,20 +104,20 @@ const createDomFromExpandedVdom = vdom => {
       dom.setAttribute(key, v)
     })
     props.children.forEach(child => {
-      dom.appendChild(createDomFromExpandedVdom(child))
+      dom.appendChild(createDomFromEvaledVdom(child))
     })
     return dom
   } else if (typeof type === 'function') {
-    return createDomFromExpandedVdom(vdom.expanded)
+    return createDomFromEvaledVdom(vdom.evaled)
   }
   console.warn('Invalid type found', type)
   return
 }
 
 export function render(vdom, mountTarget) {
-  expandedVdom = expandVDom(vdom)
-  console.log('expandedVdom', expandedVdom)
-  const dom = createDomFromExpandedVdom(expandedVdom)
+  evaledVdom = evalVdom(vdom)
+  console.log('evaledVdom', evaledVdom)
+  const dom = createDomFromEvaledVdom(evaledVdom)
   console.log('dom', dom)
   mountTarget.innerHTML = ''
   mountTarget.append(dom)
