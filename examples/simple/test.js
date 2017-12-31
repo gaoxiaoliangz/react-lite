@@ -28,6 +28,7 @@ const store = createStore(reducers)
 export default (React, Component, isFb = false) => {
   const container = () => {
 
+    /** start of common components */
     const Button = (props) => {
       return (
         <div className="btn" onClick={props.onClick}>
@@ -36,8 +37,8 @@ export default (React, Component, isFb = false) => {
       )
     }
 
-    const TestContainer = ({ desc, children }) => {
-      return (
+    const TestContainer = ({ desc, children, disabled }) => {
+      return disabled ? '' : (
         <div id={'test-' + guid()} className="test-container">
           <h3>{desc}</h3>
           {children}
@@ -45,7 +46,17 @@ export default (React, Component, isFb = false) => {
       )
     }
 
-    class ClickCounter extends Component {
+    const Wrap = props => {
+      return (
+        <div className="wrap">
+          <p>{props.level}</p>
+          <div>{props.children}</div>
+        </div>
+      )
+    }
+    /** end of common components */
+
+    class ClickCounterNoBtns extends Component {
       constructor(props) {
         super(props)
         this.state = {
@@ -71,17 +82,7 @@ export default (React, Component, isFb = false) => {
       }
     }
 
-    const Test1 = () => {
-      return (
-        <TestContainer desc="Should render number correctly">
-          <ul>
-            {_.times(5).map(n => <li key={n}>{n}</li>)}
-          </ul>
-        </TestContainer>
-      )
-    }
-
-    class Test2 extends Component {
+    class ClickCounter extends Component {
       constructor(props) {
         super(props)
         this.state = {
@@ -99,21 +100,33 @@ export default (React, Component, isFb = false) => {
 
       render() {
         return (
-          <TestContainer desc="Should render class component correctly and respond to clicks">
+          <div className="click-counter">
             <p>clicks: {this.state.clicked}</p>
             <div onClick={this.add(1)}>Add One</div>
             <Button onClick={this.add(9)}>Add Nine</Button>
-          </TestContainer>
+          </div>
         )
       }
     }
 
-    const Test3 = () => {
-      return (
-        <TestContainer desc="Should update num correctly">
-          <ClickCounter />
-        </TestContainer>
-      )
+    class UpdateCountWithRawRedux extends Component {
+      componentWillMount() {
+        store.subscribe(() => {
+          this.setState({})
+        })
+      }
+
+      render() {
+        const currentCount = store.getState().count
+        return (
+          <div>
+            <p>clicks: {currentCount}</p>
+            <Button onClick={() => {
+              store.dispatch(updateCount(currentCount + 1))
+            }}>Add 1</Button>
+          </div>
+        )
+      }
     }
 
     const UpdateCountWithRedux = connect(
@@ -134,65 +147,63 @@ export default (React, Component, isFb = false) => {
       )
     })
 
-    class Test4 extends Component {
-      componentWillMount() {
-        store.subscribe(() => {
-          this.setState({})
-        })
-      }
-
-      render() {
-        const currentCount = store.getState().count
-        return (
-          <TestContainer desc="should work fine with raw redux">
+    const renderTests = () => {
+      return (
+        <div className="tests-inner">
+          <TestContainer desc="render nested divs">
             <div>
-              <p>clicks: {currentCount}</p>
-              <Button onClick={() => {
-                store.dispatch(updateCount(currentCount + 1))
-              }}>Add 1</Button>
+              <div>
+                <div>at last</div>
+              </div>
             </div>
           </TestContainer>
-        )
-      }
-    }
-
-    const Test5 = () => {
-      return (
-        <TestContainer desc="should work fine with react redux">
-          <UpdateCountWithRedux />
-        </TestContainer>
-      )
-    }
-
-    // return (
-    //   <Provider store={store}>
-    //     <div>
-    //       <Test1 />
-    //       <Test2 />
-    //       <Test3 />
-    //       {/* <Test4 />
-    //       <Test5 /> */}
-    //     </div>
-    //   </Provider>
-    // )
-    const App = () => {
-      return (
-        <div>
-          <Test1 />
-          <Test2 />
-          <Test3 />
+          <TestContainer desc="render nested components">
+            <Wrap level={1}>
+              <Wrap level={2}>
+                <Wrap level={3}></Wrap>
+              </Wrap>
+            </Wrap>
+          </TestContainer>
+          <TestContainer disabled={true} desc="Should render number correctly">
+            <ul>
+              {_.times(5).map(n => <li key={n}>{n}</li>)}
+            </ul>
+          </TestContainer>
+          <TestContainer desc="Should render class component correctly and respond to clicks">
+            <ClickCounterNoBtns />
+          </TestContainer>
+          <TestContainer desc="Should update num correctly">
+            <ClickCounter />
+          </TestContainer>
           <TestContainer desc="render text nodes">
             <div>
-              aa
-              bb
-              cc
-              {'dd'}
+              text 1
+              {'text 2'}
             </div>
           </TestContainer>
-          {/* <Test4 />
-          <Test5 /> */}
+          <TestContainer desc="should work fine with raw redux">
+            <UpdateCountWithRawRedux />
+          </TestContainer>
+          <TestContainer disabled={true} desc="should work fine with react redux">
+            <UpdateCountWithRedux />
+          </TestContainer>
         </div>
       )
+    }
+
+    const App = ({ withProvider = false } = {}) => {
+      const tests = renderTests()
+      return withProvider
+        ? (
+          <Provider store={store}>
+            {tests}
+          </Provider>
+        )
+        : (
+          <div className="tests">
+            {tests}
+          </div >
+        )
     }
     return App
   }
