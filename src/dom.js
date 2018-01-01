@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-let evaledVdom
+const evaledNodes = new WeakMap()
 
 export function guid() {
   const s4 = () => {
@@ -19,19 +19,6 @@ function isClassComponent(v) {
   return v.__type === 'class-component'
 }
 
-function getParentLink(self) {
-  const parentLink = []
-  const exec = element => {
-    const parent = element.parent
-    if (parent) {
-      parentLink.push(parent)
-      exec(parent)
-    }
-  }
-  exec(self)
-  return parentLink
-}
-
 /**
  * evalVdom
  * @param {Object} vdom
@@ -40,79 +27,50 @@ function getParentLink(self) {
  * @param {{} | [] | String} vdom.props.children
  */
 function evalVdom(vdom) {
-  if (typeof vdom === 'undefined' || typeof vdom === 'string' || typeof vdom === 'number' || vdom === null) {
-    let str
-    try {
-      str = vdom.toString()
-    } catch (error) {
-      console.warn('Eval vdom', vdom,  error)
-      str = vdom || ''
-    }
-    return str
+  const { type, props} = vdom
+  if (isClassComponent(type)) {
+    const compIns = new type(props)
+    const evaled = compIns.render()
+    evaledNodes.set(vdom, evaled)
+    // TODO: magic happens here
+    compIns.setWatcher(() => {
+      console.log('update request')
+      // const newEvaled = evalVdom(compIns.render())
+      // const domPath = getParentLink(vdom)
+      // console.log('domPath', domPath)
+      // console.log('vdom', vdom)
+    })
+    return evaled
   }
+  const evaled = vdom.type(vdom.props)
+  evaledNodes.set(vdom, evaled)
+  return evaled
+}
 
+function evalVdomDeep(vdom) {
+  if (typeof vdom !== 'object') {
+    return
+  }
   const { type, props } = vdom
   if (typeof type === 'string') {
     const children = Array.isArray(props.children) ? props.children : [props.children]
-    const children2 = _.flattenDeep(children).map(child => {
-      const evaled = evalVdom(child)
-      if (typeof evaled === 'object') {
-        evaled.parent = vdom
-      }
-      return evaled
-      // return typeof evaled === 'object'
-      //   ? {
-      //     ...evaled,
-      //     parent: vdom
-      //   }
-      //   : evaled
-    })
-    vdom.props.children = children2.length === 1 ? children2[0] : children2
-    return vdom
-    // return {
-    //   ...vdom,
-    //   props: {
-    //     ...props,
-    //     children: 
-    //   },
-    //   // uuid: guid()
-    // }
-  } else if (isClassComponent(type)) {
-    const compIns = new type(props)
-    const evaled = evalVdom(compIns.render())
-    // magic happens here
-    compIns.setWatcher(() => {
-      console.log('update request')
-      const newEvaled = evalVdom(compIns.render())
-      const domPath = getParentLink(vdom)
-      console.log('domPath', domPath)
-      console.log('vdom', vdom)
-    })
-
-    vdom.evaled = evaled
-    return vdom
-    // return {
-    //   ...vdom,
-    //   evaled,
-    //   // uuid: guid()
-    // }
+    const children2 = _.flattenDeep(children).forEach(evalVdomDeep)
+    return
   } else if (typeof type === 'function') {
-    const evaled = evalVdom(type(props))
-    vdom.evaled = evaled
-    return vdom
-    // return {
-    //   ...vdom,
-    //   evaled,
-    //   // uuid: guid()
-    // }
+    const evaled = evalVdom(vdom)
+    evalVdomDeep(evaled)
+    return
   }
-  console.warn('Invalid type found', type)
-  return
+  console.warn('evalVdomDeep: Invalid type found', type)
 }
 
-const createDomFromEvaledVdom = vdom => {
-  if (typeof vdom === 'string') {
-    return document.createTextNode(vdom)
+function createDomDeep(vdom) {
+  if (typeof vdom !== 'object') {
+    let str = ''
+    if (typeof vdom !== 'undefined' && vdom.toString) {
+      str = vdom.toString()
+    }
+    return document.createTextNode(str)
   }
 
   const { type, props } = vdom
@@ -132,20 +90,21 @@ const createDomFromEvaledVdom = vdom => {
       dom.setAttribute(key, v)
     })
     children.forEach(child => {
-      dom.appendChild(createDomFromEvaledVdom(child))
+      dom.appendChild(createDomDeep(child))
     })
     return dom
   } else if (typeof type === 'function') {
-    return createDomFromEvaledVdom(vdom.evaled)
+    const evaled = evaledNodes.get(vdom)
+    return createDomDeep(evaled)
   }
-  console.warn('Invalid type found', type)
-  return
+  console.warn('createDomDeep: Invalid type found', type)
+  return document.createTextNode(`Invalid type: ${type}`)
 }
 
 export function render(vdom, mountTarget) {
-  evaledVdom = evalVdom(vdom)
-  console.log('evaledVdom', evaledVdom)
-  const dom = createDomFromEvaledVdom(evaledVdom)
+  evalVdomDeep(vdom)
+  console.log(evaledNodes)
+  const dom = createDomDeep(vdom)
   console.log('dom', dom)
   mountTarget.innerHTML = ''
   mountTarget.append(dom)
