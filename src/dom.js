@@ -75,12 +75,38 @@ function getUpperScope(vdom) {
 }
 /** end of scope funcs */
 
-function updateElement(element, evaled) {
+function updateElement(element, evaled, oldEvaled) {
   const { props } = evaled
   const attrs = getAttrs(props)
   _.forEach(attrs, (v, k) => {
     element.setAttribute(k, v)
   })
+
+  if (evaled.length === oldEvaled.length) {
+    // assume children have the same order
+    if (props.children) {
+      arrayGuard(props.children).forEach((child, index) => {
+        const childOld = arrayGuard(oldEvaled.props && oldEvaled.props.children)[index]
+        // update text node
+        if (typeof child !== 'object') {
+          if (child !== childOld) {
+            element.childNodes[index].textContent = child
+          }
+          return
+        }
+        // update non text node
+        const { type } = child
+        if (type !== childOld.type) {
+          // TODO
+          // element.childNodes[index] = evalVdomDeep(child)
+          return
+        }
+        updateElement(element.childNodes[index], child, childOld)
+      })
+    }
+    return
+  }
+  console.log('TODO: update children of diff len')
 }
 
 /**
@@ -103,9 +129,10 @@ function evalVdom(vdom) {
        */
       const oldEvaled = evaledNodes.get(vdom)
       const newEvaled = compIns.render()
-      updateElement(oldEvaled.dom, newEvaled)
-      newEvaled.dom = oldEvaled.dom
       evaledNodes.set(vdom, newEvaled)
+      evalVdomDeep(newEvaled)
+      updateElement(oldEvaled.dom, newEvaled, oldEvaled)
+      newEvaled.dom = oldEvaled.dom
     })
     return evaled
   }
@@ -144,7 +171,10 @@ function getAttrs(props) {
 }
 
 function arrayGuard(arrOrEle) {
-  return Array.isArray(arrOrEle) ? arrOrEle : [arrOrEle]
+  if (arrOrEle) {
+    return Array.isArray(arrOrEle) ? arrOrEle : [arrOrEle]
+  }
+  return []
 }
 
 function createDomDeep(vdom) {
