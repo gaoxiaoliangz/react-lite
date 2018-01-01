@@ -4,6 +4,8 @@ import { createStore, combineReducers } from 'redux'
 import { connect } from 'react-redux'
 import { guid } from './utils'
 
+// use weakmap to store evaled components
+
 const updateCount = count => {
   return {
     type: 'update-count',
@@ -52,6 +54,12 @@ export default (React, Component, isFb = false) => {
           <p>{props.level}</p>
           <div>{props.children}</div>
         </div>
+      )
+    }
+
+    const Sep = props => {
+      return (
+        <div className="sep"></div>
       )
     }
     /** end of common components */
@@ -164,22 +172,23 @@ export default (React, Component, isFb = false) => {
               </Wrap>
             </Wrap>
           </TestContainer>
-          <TestContainer disabled={true} desc="Should render number correctly">
-            <ul>
-              {_.times(5).map(n => <li key={n}>{n}</li>)}
-            </ul>
-          </TestContainer>
-          <TestContainer desc="Should render class component correctly and respond to clicks">
-            <ClickCounterNoBtns />
-          </TestContainer>
-          <TestContainer desc="Should update num correctly">
-            <ClickCounter />
-          </TestContainer>
           <TestContainer desc="render text nodes">
             <div>
               text 1
               {'text 2'}
             </div>
+          </TestContainer>
+          <TestContainer disabled={true} desc="render number">
+            <ul>
+              {_.times(5).map(n => <li key={n}>{n}</li>)}
+            </ul>
+          </TestContainer>
+          <Sep />
+          <TestContainer desc="should render class component correctly and respond to clicks">
+            <ClickCounterNoBtns />
+          </TestContainer>
+          <TestContainer desc="should update num correctly">
+            <ClickCounter />
           </TestContainer>
           <TestContainer desc="should work fine with raw redux">
             <UpdateCountWithRawRedux />

@@ -19,6 +19,19 @@ function isClassComponent(v) {
   return v.__type === 'class-component'
 }
 
+function getParentLink(self) {
+  const parentLink = []
+  const exec = element => {
+    const parent = element.parent
+    if (parent) {
+      parentLink.push(parent)
+      exec(parent)
+    }
+  }
+  exec(self)
+  return parentLink
+}
+
 /**
  * evalVdom
  * @param {Object} vdom
@@ -32,7 +45,7 @@ function evalVdom(vdom) {
     try {
       str = vdom.toString()
     } catch (error) {
-      console.warn('Eval vdom', error)
+      console.warn('Eval vdom', vdom,  error)
       str = vdom || ''
     }
     return str
@@ -41,43 +54,57 @@ function evalVdom(vdom) {
   const { type, props } = vdom
   if (typeof type === 'string') {
     const children = Array.isArray(props.children) ? props.children : [props.children]
-    return {
-      ...vdom,
-      props: {
-        ...props,
-        children: _.flattenDeep(children).map(child => {
-          const evaled = evalVdom(child)
-          return typeof evaled === 'object'
-            ? {
-              ...evaled,
-              parent: vdom
-            }
-            : evaled
-        })
-      },
-      // uuid: guid()
-    }
+    const children2 = _.flattenDeep(children).map(child => {
+      const evaled = evalVdom(child)
+      if (typeof evaled === 'object') {
+        evaled.parent = vdom
+      }
+      return evaled
+      // return typeof evaled === 'object'
+      //   ? {
+      //     ...evaled,
+      //     parent: vdom
+      //   }
+      //   : evaled
+    })
+    vdom.props.children = children2.length === 1 ? children2[0] : children2
+    return vdom
+    // return {
+    //   ...vdom,
+    //   props: {
+    //     ...props,
+    //     children: 
+    //   },
+    //   // uuid: guid()
+    // }
   } else if (isClassComponent(type)) {
     const compIns = new type(props)
     const evaled = evalVdom(compIns.render())
-
-    // // magic happens here
+    // magic happens here
     compIns.setWatcher(() => {
       console.log('update request')
+      const newEvaled = evalVdom(compIns.render())
+      const domPath = getParentLink(vdom)
+      console.log('domPath', domPath)
+      console.log('vdom', vdom)
     })
 
-    return {
-      ...vdom,
-      evaled,
-      // uuid: guid()
-    }
+    vdom.evaled = evaled
+    return vdom
+    // return {
+    //   ...vdom,
+    //   evaled,
+    //   // uuid: guid()
+    // }
   } else if (typeof type === 'function') {
     const evaled = evalVdom(type(props))
-    return {
-      ...vdom,
-      evaled,
-      // uuid: guid()
-    }
+    vdom.evaled = evaled
+    return vdom
+    // return {
+    //   ...vdom,
+    //   evaled,
+    //   // uuid: guid()
+    // }
   }
   console.warn('Invalid type found', type)
   return
@@ -92,6 +119,7 @@ const createDomFromEvaledVdom = vdom => {
   if (typeof type === 'string') {
     const dom = document.createElement(type)
     const attrs = _.omit(props, ['children', 'onClick'])
+    const children = Array.isArray(props.children) ? props.children : [props.children]
     if (props.onClick) {
       dom.addEventListener('click', () => {
         console.log('clicked')
@@ -103,7 +131,7 @@ const createDomFromEvaledVdom = vdom => {
       const key = k === 'className' ? 'class' : k
       dom.setAttribute(key, v)
     })
-    props.children.forEach(child => {
+    children.forEach(child => {
       dom.appendChild(createDomFromEvaledVdom(child))
     })
     return dom

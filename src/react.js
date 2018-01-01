@@ -21,6 +21,7 @@ export class Component {
   }
 
   setWatcher(cb) {
+    console.log('set watcher')
     this.watcherCb = cb
   }
 
