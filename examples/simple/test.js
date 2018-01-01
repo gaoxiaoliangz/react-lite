@@ -116,7 +116,7 @@ export default (React, Component, isFb = false) => {
 
       render() {
         return (
-          <div className="click-counter">
+          <div className={'click-counter ' + 'clicked-' + this.state.clicked} data-clicked={this.state.clicked}>
             <p>clicks: {this.state.clicked}</p>
             <div onClick={this.add(1)}>Add One</div>
             <Button onClick={this.add(9)}>Add Nine</Button>

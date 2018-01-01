@@ -43,6 +43,7 @@ function isClassComponent(v) {
   return v.__type === 'class-component'
 }
 
+/** start of scope funcs */
 function hasChildDeep(vdom, child) {
   if (typeof vdom !== 'object') {
     return false
@@ -72,9 +73,14 @@ function getUpperScope(vdom) {
   })
   return found
 }
+/** end of scope funcs */
 
-function getScopeList(vdom) {
-  
+function updateElement(element, evaled) {
+  const { props } = evaled
+  const attrs = getAttrs(props)
+  _.forEach(attrs, (v, k) => {
+    element.setAttribute(k, v)
+  })
 }
 
 /**
@@ -90,25 +96,16 @@ function evalVdom(vdom) {
     const compIns = new type(props)
     const evaled = compIns.render()
     evaledNodes.set(vdom, evaled)
-    // TODO: magic happens here
-    compIns.setWatcher(() => {
-      console.log('update request')
 
+    compIns.setWatcher(() => {
+      /**
+       * THE MAGIC HAPPENS HERE
+       */
       const oldEvaled = evaledNodes.get(vdom)
       const newEvaled = compIns.render()
-      // console.log(oldEvaled)
-      // console.log(newEvaled)
-
-      // TODO: upperScope list
-      const upperScope = getUpperScope(vdom)
-      console.log('upperScope', upperScope)
-      console.log('upper', getUpperScope(upperScope))
-
-
-      // const newEvaled = evalVdom(compIns.render())
-      // const domPath = getParentLink(vdom)
-      // console.log('domPath', domPath)
-      // console.log('vdom', vdom)
+      updateElement(oldEvaled.dom, newEvaled)
+      newEvaled.dom = oldEvaled.dom
+      evaledNodes.set(vdom, newEvaled)
     })
     return evaled
   }
@@ -134,6 +131,22 @@ function evalVdomDeep(vdom) {
   console.warn('evalVdomDeep: Invalid type found', type)
 }
 
+function getAttrs(props) {
+  return _.flow(
+    _.curryRight(_.omitBy)((v, k) => ['children', 'onClick'].includes(k)),
+    _.curryRight(_.mapKeys)((v, k) => {
+      if (k === 'className') {
+        return 'class'
+      }
+      return k
+    })
+  )(props)
+}
+
+function arrayGuard(arrOrEle) {
+  return Array.isArray(arrOrEle) ? arrOrEle : [arrOrEle]
+}
+
 function createDomDeep(vdom) {
   if (typeof vdom !== 'object') {
     let str = ''
@@ -146,18 +159,13 @@ function createDomDeep(vdom) {
   const { type, props } = vdom
   if (typeof type === 'string') {
     const dom = document.createElement(type)
-    const attrs = _.omit(props, ['children', 'onClick'])
-    const children = Array.isArray(props.children) ? props.children : [props.children]
+    const attrs = getAttrs(props)
+    const children = arrayGuard(props.children)
     if (props.onClick) {
-      dom.addEventListener('click', () => {
-        console.log('clicked')
-        props.onClick()
-      })
-      console.log('setup click for', dom)
+      dom.addEventListener('click', props.onClick)
     }
     _.forEach(attrs, (v, k) => {
-      const key = k === 'className' ? 'class' : k
-      dom.setAttribute(key, v)
+      dom.setAttribute(k, v)
     })
     children.forEach(child => {
       dom.appendChild(createDomDeep(child))
