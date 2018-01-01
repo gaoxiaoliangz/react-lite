@@ -21,13 +21,12 @@ export class Component {
   }
 
   setWatcher(cb) {
-    console.log('set watcher')
     this.watcherCb = cb
   }
 
   setState(state, cb) {
     this.state = state
-    console.log('setState', state)
+    console.info('setState', state)
     this.watcherCb()
     if (cb) cb()
   }

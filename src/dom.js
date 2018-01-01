@@ -43,9 +43,13 @@ function isClassComponent(v) {
   return v.__type === 'class-component'
 }
 
+function isVdomObject(vdom) {
+  return typeof vdom === 'object' && vdom !== null
+}
+
 /** start of scope funcs */
 function hasChildDeep(vdom, child) {
-  if (typeof vdom !== 'object') {
+  if (!isVdomObject(vdom)) {
     return false
   }
   const { props: { children } } = vdom
@@ -75,12 +79,21 @@ function getUpperScope(vdom) {
 }
 /** end of scope funcs */
 
-function updateElement(element, evaled, oldEvaled) {
+// TODO: replace createDomDeep
+function updateElementDeep(element, evaled, oldEvaled) {
   const { props } = evaled
+  const { props: oldProps } = oldEvaled
   const attrs = getAttrs(props)
   _.forEach(attrs, (v, k) => {
     element.setAttribute(k, v)
   })
+  // TODO: support more events
+  if (oldProps.onClick) {
+    element.removeEventListener('click', oldProps.onClick)
+  }
+  if (props.onClick) {
+    element.addEventListener('click', props.onClick)
+  }
 
   if (evaled.length === oldEvaled.length) {
     // assume children have the same order
@@ -88,7 +101,7 @@ function updateElement(element, evaled, oldEvaled) {
       arrayGuard(props.children).forEach((child, index) => {
         const childOld = arrayGuard(oldEvaled.props && oldEvaled.props.children)[index]
         // update text node
-        if (typeof child !== 'object') {
+        if (!isVdomObject(child)) {
           if (child !== childOld) {
             element.childNodes[index].textContent = child
           }
@@ -101,7 +114,7 @@ function updateElement(element, evaled, oldEvaled) {
           // element.childNodes[index] = evalVdomDeep(child)
           return
         }
-        updateElement(element.childNodes[index], child, childOld)
+        updateElementDeep(element.childNodes[index], child, childOld)
       })
     }
     return
@@ -131,7 +144,7 @@ function evalVdom(vdom) {
       const newEvaled = compIns.render()
       evaledNodes.set(vdom, newEvaled)
       evalVdomDeep(newEvaled)
-      updateElement(oldEvaled.dom, newEvaled, oldEvaled)
+      updateElementDeep(oldEvaled.dom, newEvaled, oldEvaled)
       newEvaled.dom = oldEvaled.dom
     })
     return evaled
@@ -142,7 +155,7 @@ function evalVdom(vdom) {
 }
 
 function evalVdomDeep(vdom) {
-  if (typeof vdom !== 'object') {
+  if (!isVdomObject(vdom)) {
     return
   }
   const { type, props } = vdom
@@ -178,7 +191,7 @@ function arrayGuard(arrOrEle) {
 }
 
 function createDomDeep(vdom) {
-  if (typeof vdom !== 'object') {
+  if (!isVdomObject(vdom)) {
     let str = ''
     if (typeof vdom !== 'undefined' && vdom.toString) {
       str = vdom.toString()
@@ -215,9 +228,7 @@ function createDomDeep(vdom) {
 
 export function render(vdom, mountTarget) {
   evalVdomDeep(vdom)
-  console.log(evaledNodes)
   const dom = createDomDeep(vdom)
-  console.log('dom', dom)
   mountTarget.innerHTML = ''
   mountTarget.append(dom)
 }

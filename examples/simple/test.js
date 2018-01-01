@@ -106,16 +106,22 @@ export default (React, Component, isFb = false) => {
         }
       }
 
-      add(step) {
+      change(v) {
         return () => {
           this.setState({
-            clicked: this.state.clicked + step
+            clicked: v
           })
         }
       }
 
+      addOne() {
+        this.change(this.state.clicked + 1)()
+      }
+
       render() {
         const isEven = this.state.clicked % 2 === 0
+        const clicked = this.state.clicked
+        console.log(clicked)
         return (
           <div className={'click-counter ' + 'clicked-' + this.state.clicked} data-clicked={this.state.clicked}>
             {
@@ -124,8 +130,12 @@ export default (React, Component, isFb = false) => {
                 : <div>[2]clicks: {this.state.clicked}</div>
             }
             <p>clicks: {isEven ? '[even]' : null} {this.state.clicked} </p>
-            <div onClick={this.add(1)}>Add One</div>
-            <Button onClick={this.add(9)}>Add Nine</Button>
+            <p>[node len unchanged]clicks: {this.state.clicked} </p>
+            <Button onClick={() => {
+              this.addOne()
+            }}>+</Button>
+            <Button onClick={this.change(clicked + 1)}>+</Button>
+            <Button onClick={this.change(clicked - 1)}>-</Button>
           </div>
         )
       }
@@ -236,9 +246,9 @@ export default (React, Component, isFb = false) => {
 
   const beforeRun = () => {
     const App = container()
-    console.log('---', isFb ? 'fb here' : 'my own', '---')
-    console.log('App children', App().props.children)
-    console.log('App inside', App())
+    // console.log('---', isFb ? 'fb here' : 'my own', '---')
+    // console.log('App children', App().props.children)
+    // console.log('App inside', App())
     return App
   }
 
