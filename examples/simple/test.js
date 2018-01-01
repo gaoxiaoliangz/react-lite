@@ -121,7 +121,6 @@ export default (React, Component, isFb = false) => {
       render() {
         const isEven = this.state.clicked % 2 === 0
         const clicked = this.state.clicked
-        console.log(clicked)
         return (
           <div className={'click-counter ' + 'clicked-' + this.state.clicked} data-clicked={this.state.clicked}>
             {
@@ -129,7 +128,7 @@ export default (React, Component, isFb = false) => {
                 ? <p>clicks: {this.state.clicked}</p>
                 : <div>[2]clicks: {this.state.clicked}</div>
             }
-            <p>clicks: {isEven ? '[even]' : null} {this.state.clicked} </p>
+            <p>clicks: {isEven ? null : '[odd]'} {this.state.clicked} </p>
             <p>[node len unchanged]clicks: {this.state.clicked} </p>
             <Button onClick={() => {
               this.addOne()
@@ -182,6 +181,15 @@ export default (React, Component, isFb = false) => {
     const renderTests = () => {
       return (
         <div className="tests-inner">
+          <TestContainer desc="render primitives (empty func or object is not valid)">
+            {0}
+            {1}
+            {undefined}
+            {null}
+            {true}
+            {false}
+            {[]}
+          </TestContainer>
           <TestContainer desc="render nested divs">
             <div>
               <div>

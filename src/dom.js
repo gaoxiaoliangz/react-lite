@@ -44,7 +44,10 @@ function isClassComponent(v) {
 }
 
 function isVdomObject(vdom) {
-  return typeof vdom === 'object' && vdom !== null
+  if (notEmptyNode(vdom)) {
+    return typeof vdom === 'object' && vdom.type && vdom.props
+  }
+  return false
 }
 
 /** start of scope funcs */
@@ -83,6 +86,8 @@ function getUpperScope(vdom) {
 function updateElementDeep(element, evaled, oldEvaled) {
   const { props } = evaled
   const { props: oldProps } = oldEvaled
+  const children = arrayGuard(props.children)
+  const oldChildren = arrayGuard(oldProps.children)
   const attrs = getAttrs(props)
   _.forEach(attrs, (v, k) => {
     element.setAttribute(k, v)
@@ -95,26 +100,27 @@ function updateElementDeep(element, evaled, oldEvaled) {
     element.addEventListener('click', props.onClick)
   }
 
-  if (evaled.length === oldEvaled.length) {
+  if (children.length === oldChildren.length) {
     // assume children have the same order
     if (props.children) {
-      arrayGuard(props.children).forEach((child, index) => {
-        const childOld = arrayGuard(oldEvaled.props && oldEvaled.props.children)[index]
+      children.forEach((child, index) => {
+        const oldChild = oldChildren[index]
         // update text node
         if (!isVdomObject(child)) {
-          if (child !== childOld) {
+          console.log(children, oldChildren)
+          if (child !== oldChild) {
             element.childNodes[index].textContent = child
           }
           return
         }
         // update non text node
         const { type } = child
-        if (type !== childOld.type) {
+        if (type !== oldChild.type) {
           // TODO
           // element.childNodes[index] = evalVdomDeep(child)
           return
         }
-        updateElementDeep(element.childNodes[index], child, childOld)
+        updateElementDeep(element.childNodes[index], child, oldChild)
       })
     }
     return
@@ -130,7 +136,7 @@ function updateElementDeep(element, evaled, oldEvaled) {
  * @param {{} | [] | String} vdom.props.children
  */
 function evalVdom(vdom) {
-  const { type, props} = vdom
+  const { type, props } = vdom
   if (isClassComponent(type)) {
     const compIns = new type(props)
     const evaled = compIns.render()
@@ -161,7 +167,9 @@ function evalVdomDeep(vdom) {
   const { type, props } = vdom
   if (typeof type === 'string') {
     const children = Array.isArray(props.children) ? props.children : [props.children]
-    const children2 = _.flattenDeep(children).forEach(evalVdomDeep)
+    const children2 = _.flattenDeep(children)
+      .filter(notEmptyNode)
+      .forEach(evalVdomDeep)
     return
   } else if (typeof type === 'function') {
     const evaled = evalVdom(vdom)
@@ -190,13 +198,17 @@ function arrayGuard(arrOrEle) {
   return []
 }
 
+function notEmptyNode(node) {
+  return ![undefined, null, false, true].includes(node)
+}
+
 function createDomDeep(vdom) {
   if (!isVdomObject(vdom)) {
-    let str = ''
-    if (typeof vdom !== 'undefined' && vdom.toString) {
-      str = vdom.toString()
+    // should have been filtered from evalVdomDeep, keep it here just in case
+    if (!notEmptyNode(vdom)) {
+      return
     }
-    return document.createTextNode(str)
+    return document.createTextNode(vdom.toString())
   }
 
   const { type, props } = vdom
@@ -210,9 +222,13 @@ function createDomDeep(vdom) {
     _.forEach(attrs, (v, k) => {
       dom.setAttribute(k, v)
     })
-    children.forEach(child => {
-      dom.appendChild(createDomDeep(child))
-    })
+    children
+      .forEach(child => {
+        const childDom = createDomDeep(child)
+        if (childDom) {
+          dom.appendChild(childDom)
+        }
+      })
     return dom
   } else if (typeof type === 'function') {
     const evaled = evaledNodes.get(vdom)
