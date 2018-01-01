@@ -1,6 +1,9 @@
 * {
   box-sizing: border-box;
 }
+p {
+  margin: 0;
+}
 .left {
   float: left;
 }

@@ -115,9 +115,15 @@ export default (React, Component, isFb = false) => {
       }
 
       render() {
+        const isEven = this.state.clicked % 2 === 0
         return (
           <div className={'click-counter ' + 'clicked-' + this.state.clicked} data-clicked={this.state.clicked}>
-            <p>clicks: {this.state.clicked}</p>
+            {
+              isEven
+                ? <p>clicks: {this.state.clicked}</p>
+                : <div>[2]clicks: {this.state.clicked}</div>
+            }
+            <p>clicks: {isEven ? '[even]' : null} {this.state.clicked} </p>
             <div onClick={this.add(1)}>Add One</div>
             <Button onClick={this.add(9)}>Add Nine</Button>
           </div>
