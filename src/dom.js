@@ -1,6 +1,30 @@
 import _ from 'lodash'
 
-const evaledNodes = new WeakMap()
+class IterableWeakMap {
+  constructor() {
+    this._wm = new WeakMap()
+    this._keys = []
+  }
+
+  set(key, val) {
+    this._wm.set(key, val)
+    this._keys.push(key)
+  }
+
+  get(key) {
+    return this._wm.get(key)
+  }
+
+  forEach(fn) {
+    this._keys.forEach((key, index) => {
+      fn({
+        key,
+        value: this._wm.get(key)
+      }, index)
+    })
+  }
+}
+const evaledNodes = new IterableWeakMap()
 
 export function guid() {
   const s4 = () => {
@@ -19,6 +43,40 @@ function isClassComponent(v) {
   return v.__type === 'class-component'
 }
 
+function hasChildDeep(vdom, child) {
+  if (typeof vdom !== 'object') {
+    return false
+  }
+  const { props: { children } } = vdom
+  if (children) {
+    const children2 = Array.isArray(children) ? children : [children]
+    return children2.some(child2 => {
+      if (child2 === child) {
+        return true
+      }
+      return hasChildDeep(child2, child)
+    })
+  }
+  return false
+}
+
+function getUpperScope(vdom) {
+  let found
+  evaledNodes.forEach(node => {
+    if (!found && node.key !== vdom) {
+      const result = hasChildDeep(node.value, vdom)
+      if (result) {
+        found = node.key
+      }
+    }
+  })
+  return found
+}
+
+function getScopeList(vdom) {
+  
+}
+
 /**
  * evalVdom
  * @param {Object} vdom
@@ -35,6 +93,18 @@ function evalVdom(vdom) {
     // TODO: magic happens here
     compIns.setWatcher(() => {
       console.log('update request')
+
+      const oldEvaled = evaledNodes.get(vdom)
+      const newEvaled = compIns.render()
+      // console.log(oldEvaled)
+      // console.log(newEvaled)
+
+      // TODO: upperScope list
+      const upperScope = getUpperScope(vdom)
+      console.log('upperScope', upperScope)
+      console.log('upper', getUpperScope(upperScope))
+
+
       // const newEvaled = evalVdom(compIns.render())
       // const domPath = getParentLink(vdom)
       // console.log('domPath', domPath)
@@ -95,7 +165,11 @@ function createDomDeep(vdom) {
     return dom
   } else if (typeof type === 'function') {
     const evaled = evaledNodes.get(vdom)
-    return createDomDeep(evaled)
+    const dom = createDomDeep(evaled)
+    if (typeof evaled === 'object') {
+      evaled.dom = dom
+    }
+    return dom
   }
   console.warn('createDomDeep: Invalid type found', type)
   return document.createTextNode(`Invalid type: ${type}`)

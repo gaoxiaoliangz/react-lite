@@ -90,6 +90,14 @@ export default (React, Component, isFb = false) => {
       }
     }
 
+    const ClickCounterWithWrap = () => {
+      return (
+        <div className="counter-wrap">
+          <ClickCounter />
+        </div>
+      )
+    }
+
     class ClickCounter extends Component {
       constructor(props) {
         super(props)
@@ -187,8 +195,11 @@ export default (React, Component, isFb = false) => {
           <TestContainer desc="should render class component correctly and respond to clicks">
             <ClickCounterNoBtns />
           </TestContainer>
-          <TestContainer desc="should update num correctly">
+          <TestContainer desc="should update num correctly with setState">
             <ClickCounter />
+          </TestContainer>
+          <TestContainer desc="ClickCounterWithWrap should update num correctly with setState">
+            <ClickCounterWithWrap />
           </TestContainer>
           <TestContainer desc="should work fine with raw redux">
             <UpdateCountWithRawRedux />
