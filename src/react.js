@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { isVdomObject } from './utils';
+import { isVnodeObject } from './utils';
 
 export function createElement(type, props, ...children) {
   const { key } = props || {}
@@ -7,7 +7,7 @@ export function createElement(type, props, ...children) {
   // a simple validation (key validation to be specific)
   children.forEach(child => {
     if (Array.isArray(child)) {
-      const keys = child.filter(isVdomObject).map(v => v.key)
+      const keys = child.filter(isVnodeObject).map(v => v.key)
       if (keys.length !== _.union(keys).length) {
         // TODO: show exactly which key
         console.warn('Encountered two children with the same key')

@@ -15,6 +15,10 @@ export class IterableWeakMap {
     return this._wm.get(key)
   }
 
+  has(key) {
+    return this._wm.has(key)
+  }
+
   forEach(fn) {
     this._keys.forEach((key, index) => {
       fn({
@@ -42,15 +46,19 @@ export function isClassComponent(v) {
   return v.__type === 'class-component'
 }
 
-export function isVdomObject(vdom) {
+export function isVnodeObject(vdom) {
   if (notEmptyNode(vdom)) {
     return typeof vdom === 'object' && vdom.type && vdom.props
   }
   return false
 }
 
+export function isTextVnode(vnode) {
+  return !isVnodeObject(vnode)
+}
+
 export function hasChildDeep(vdom, child) {
-  if (!isVdomObject(vdom)) {
+  if (!isVnodeObject(vdom)) {
     return false
   }
   const { props: { children } } = vdom
@@ -100,4 +108,10 @@ export function arrayGuard(arrOrEle) {
 
 export function notEmptyNode(node) {
   return ![undefined, null, false, true].includes(node)
+}
+
+export function updateAttrs($dom, attrsObject) {
+  _.forEach(attrsObject, (v, k) => {
+    $dom.setAttribute(k, v)
+  })
 }

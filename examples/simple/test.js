@@ -181,7 +181,7 @@ export default (React, Component, isFb = false) => {
     const renderTests = () => {
       return (
         <div className="tests-inner">
-          {/* <TestContainer desc="render primitives (empty func or object is not valid)">
+          <TestContainer desc="render primitives (empty func or object is not valid)">
             {0}
             {1}
             {undefined}
@@ -190,7 +190,7 @@ export default (React, Component, isFb = false) => {
             {false}
             {[]}
             {[1, 2]}
-          </TestContainer> */}
+          </TestContainer>
           <TestContainer desc="render an array of elements manually without key">
             <div>
               <div>0</div>
@@ -222,7 +222,7 @@ export default (React, Component, isFb = false) => {
               }
             </div>
           </TestContainer> */}
-          {/* <TestContainer desc="render nested divs">
+          <TestContainer desc="render nested divs">
             <div>
               <div>
                 <div>at last</div>
@@ -262,7 +262,7 @@ export default (React, Component, isFb = false) => {
           </TestContainer>
           <TestContainer disabled={true} desc="should work fine with react redux">
             <UpdateCountWithRedux />
-          </TestContainer> */}
+          </TestContainer>
         </div>
       )
     }
@@ -281,6 +281,68 @@ export default (React, Component, isFb = false) => {
           </div >
         )
     }
+
+    const App2 = () => {
+      return (
+        <div className="app">
+          <div className="item-1">
+            so
+            <div>
+              it's ok
+            </div>
+          </div>
+          <Button>abc</Button>
+        </div>
+      )
+    }
+
+    const App3 = () => {
+      return (
+        <div className="app">
+          <div className="item-1">1</div>
+          <div className="item-2">
+            <div>deep</div>
+          </div>
+        </div>
+      )
+    }
+
+    class App4 extends Component {
+      constructor(props) {
+        super(props)
+        this.state = {
+          flag: true
+        }
+        this.handleClick = this.handleClick.bind(this)
+      }
+
+      handleClick() {
+        this.setState({
+          flag: !this.state.flag
+        })
+      }
+
+      render() {
+        return (
+          <div>
+            <div>
+              <div>yes?</div>
+              {
+                this.state.flag
+                  ? (
+                    <div onClick={this.handleClick}>with div</div>
+                  )
+                  : (
+                    <span onClick={this.handleClick}>with span</span>
+                  )
+              }
+              <div>end of line</div>
+            </div>
+          </div>
+        )
+      }
+    }
+
     return App
   }
 
