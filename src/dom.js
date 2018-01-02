@@ -1,86 +1,7 @@
 import _ from 'lodash'
+import { isClassComponent, isVdomObject, arrayGuard, IterableWeakMap, getAttrs, notEmptyNode } from './utils'
 
-class IterableWeakMap {
-  constructor() {
-    this._wm = new WeakMap()
-    this._keys = []
-  }
-
-  set(key, val) {
-    this._wm.set(key, val)
-    this._keys.push(key)
-  }
-
-  get(key) {
-    return this._wm.get(key)
-  }
-
-  forEach(fn) {
-    this._keys.forEach((key, index) => {
-      fn({
-        key,
-        value: this._wm.get(key)
-      }, index)
-    })
-  }
-}
 const evaledNodes = new IterableWeakMap()
-
-export function guid() {
-  const s4 = () => {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1)
-  }
-  return s4() + s4()
-}
-
-// TODO: a more general way to detect
-function isClassComponent(v) {
-  if (typeof v !== 'function') {
-    return false
-  }
-  return v.__type === 'class-component'
-}
-
-function isVdomObject(vdom) {
-  if (notEmptyNode(vdom)) {
-    return typeof vdom === 'object' && vdom.type && vdom.props
-  }
-  return false
-}
-
-/** start of scope funcs */
-function hasChildDeep(vdom, child) {
-  if (!isVdomObject(vdom)) {
-    return false
-  }
-  const { props: { children } } = vdom
-  if (children) {
-    const children2 = Array.isArray(children) ? children : [children]
-    return children2.some(child2 => {
-      if (child2 === child) {
-        return true
-      }
-      return hasChildDeep(child2, child)
-    })
-  }
-  return false
-}
-
-function getUpperScope(vdom) {
-  let found
-  evaledNodes.forEach(node => {
-    if (!found && node.key !== vdom) {
-      const result = hasChildDeep(node.value, vdom)
-      if (result) {
-        found = node.key
-      }
-    }
-  })
-  return found
-}
-/** end of scope funcs */
 
 // TODO: replace createDomDeep
 function updateElementDeep(element, evaled, oldEvaled) {
@@ -168,7 +89,6 @@ function evalVdomDeep(vdom) {
   if (typeof type === 'string') {
     const children = Array.isArray(props.children) ? props.children : [props.children]
     const children2 = _.flattenDeep(children)
-      .filter(notEmptyNode)
       .forEach(evalVdomDeep)
     return
   } else if (typeof type === 'function') {
@@ -177,29 +97,6 @@ function evalVdomDeep(vdom) {
     return
   }
   console.warn('evalVdomDeep: Invalid type found', type)
-}
-
-function getAttrs(props) {
-  return _.flow(
-    _.curryRight(_.omitBy)((v, k) => ['children', 'onClick'].includes(k)),
-    _.curryRight(_.mapKeys)((v, k) => {
-      if (k === 'className') {
-        return 'class'
-      }
-      return k
-    })
-  )(props)
-}
-
-function arrayGuard(arrOrEle) {
-  if (arrOrEle) {
-    return Array.isArray(arrOrEle) ? arrOrEle : [arrOrEle]
-  }
-  return []
-}
-
-function notEmptyNode(node) {
-  return ![undefined, null, false, true].includes(node)
 }
 
 function createDomDeep(vdom) {
@@ -215,7 +112,7 @@ function createDomDeep(vdom) {
   if (typeof type === 'string') {
     const dom = document.createElement(type)
     const attrs = getAttrs(props)
-    const children = arrayGuard(props.children)
+    const children = _.flattenDeep(arrayGuard(props.children))
     if (props.onClick) {
       dom.addEventListener('click', props.onClick)
     }
@@ -223,6 +120,7 @@ function createDomDeep(vdom) {
       dom.setAttribute(k, v)
     })
     children
+      .filter(notEmptyNode)
       .forEach(child => {
         const childDom = createDomDeep(child)
         if (childDom) {
@@ -245,6 +143,7 @@ function createDomDeep(vdom) {
 export function render(vdom, mountTarget) {
   evalVdomDeep(vdom)
   const dom = createDomDeep(vdom)
+  console.log(evaledNodes)
   mountTarget.innerHTML = ''
   mountTarget.append(dom)
 }
