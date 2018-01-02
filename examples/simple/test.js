@@ -181,7 +181,7 @@ export default (React, Component, isFb = false) => {
     const renderTests = () => {
       return (
         <div className="tests-inner">
-          <TestContainer desc="render primitives (empty func or object is not valid)">
+          {/* <TestContainer desc="render primitives (empty func or object is not valid)">
             {0}
             {1}
             {undefined}
@@ -189,8 +189,40 @@ export default (React, Component, isFb = false) => {
             {true}
             {false}
             {[]}
+            {[1, 2]}
+          </TestContainer> */}
+          <TestContainer desc="render an array of elements manually without key">
+            <div>
+              <div>0</div>
+              <div>1</div>
+              <div>2</div>
+            </div>
           </TestContainer>
-          <TestContainer desc="render nested divs">
+          <TestContainer desc="render an array of elements and string without key">
+            <div>
+              {
+                [
+                  <div key={0}>0</div>,
+                  <div key={1}>1</div>,
+                  <div key={2}>2</div>,
+                  1,
+                  2
+                ]
+              }
+            </div>
+          </TestContainer>
+          {/* <TestContainer desc="render an array of elements with dup key">
+            <div>
+              {
+                [
+                  <div key={0}>0</div>,
+                  <div key={0}>1</div>,
+                  <div key={2}>2</div>
+                ]
+              }
+            </div>
+          </TestContainer> */}
+          {/* <TestContainer desc="render nested divs">
             <div>
               <div>
                 <div>at last</div>
@@ -230,7 +262,7 @@ export default (React, Component, isFb = false) => {
           </TestContainer>
           <TestContainer disabled={true} desc="should work fine with react redux">
             <UpdateCountWithRedux />
-          </TestContainer>
+          </TestContainer> */}
         </div>
       )
     }

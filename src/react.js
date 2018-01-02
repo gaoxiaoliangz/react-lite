@@ -1,7 +1,23 @@
 import _ from 'lodash'
+import { isVdomObject } from './utils';
 
 export function createElement(type, props, ...children) {
   const { key } = props || {}
+
+  // a simple validation (key validation to be specific)
+  children.forEach(child => {
+    if (Array.isArray(child)) {
+      const keys = child.filter(isVdomObject).map(v => v.key)
+      if (keys.length !== _.union(keys).length) {
+        // TODO: show exactly which key
+        console.warn('Encountered two children with the same key')
+      }
+      if (keys.length !== keys.filter(key => typeof key !== 'undefined').length) {
+        // TODO: print component trace
+        console.warn('Each child in an array or iterator should have a unique "key" prop.')
+      }
+    }
+  })
 
   return {
     type,
