@@ -1,11 +1,19 @@
 * {
   box-sizing: border-box;
 }
+p {
+  margin: 0;
+}
 .left {
   float: left;
 }
 .right {
   float: right;
+}
+.sep {
+  height: 2px;
+  width: 100%;
+  background: #333;
 }
 #root,
 #root2 {
@@ -19,6 +27,11 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
+}
+.test-container {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
 }
 .test-container h3 {
   color: #666;

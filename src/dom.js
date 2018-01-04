@@ -1,62 +1,158 @@
 import _ from 'lodash'
+import {
+  isClassComponent,
+  isVnodeObject,
+  arrayGuard,
+  IterableWeakMap,
+  getAttrs,
+  notEmptyNode,
+  isTextVnode,
+  updateAttrs,
+  getUpperScope
+} from './utils'
 
 /**
- * vdomToDom
- * @param {Object} vdom
- * @param {String | Function} vdom.type
- * @param {Object} vdom.props
- * @param {{} | [] | String} vdom.props.children
+ * an example of cached render object
+ * { evaled: { type, props, key }, instance, $ref }
  */
-function vdomToDom(vdom) {
-  if (typeof vdom === 'undefined' || typeof vdom === 'string' || typeof vdom === 'number' || vdom === null) {
-    let str
-    try {
-      str = vdom.toString()
-    } catch (error) {
-      str = vdom
-    }
-    const text = document.createTextNode(str)
-    return text
+const cachedEvals = new IterableWeakMap()
+
+/**
+ * 
+ * @param {*} vnode2 
+ * @param {*} $mountTarget2
+ * @param {Object} prevEvaled2
+ */
+export function render(vnode2, $mountTarget2, prevEvaled2) {
+  if (!prevEvaled) {
+    $mountTarget2.innerHTML = ''
   }
-  const { type, props } = vdom
-  if (typeof type === 'string') {
-    const dom = document.createElement(type)
-    const attrs = _.omit(props, ['children', 'onClick'])
-    if (props.onClick) {
-      dom.addEventListener('click', props.onClick)
+
+  const _render = (vnode, $mountTarget, prevEvaled) => {
+    if (isTextVnode(vnode)) {
+      const textNode = document.createTextNode(vnode.toString())
+      return textNode
     }
-    _.forEach(attrs, (v, k) => {
-      const key = k === 'className' ? 'class' : k
-      dom.setAttribute(key, v)
-    })
-    const children = Array.isArray(props.children) ? props.children : [props.children]
-    _.flattenDeep(children)
-      .map(child => {
-        return vdomToDom(child)
-      })
-      .forEach(child => {
-        dom.appendChild(child)
-      })
-    return dom
-  } else if (type.__type === 'class-component') {
-    const compIns = new type(props)
-    const dom = vdomToDom(compIns.render())
-    compIns.setWatcher(() => {
-      console.log('update request')
-      const newDom = vdomToDom(compIns.render())
-      console.log(newDom)
-      dom.innerHTML = newDom.innerHTML
-    })
-    return dom
-  } else if (typeof type === 'function') {
-    return vdomToDom(type(props))
+
+    const { type, props } = vnode
+    if (typeof type === 'string') {
+      const $fragment = document.createElement(type)
+      const children = _.flattenDeep(arrayGuard(props.children))
+      // TODO: support more events
+      // if (oldProps.onClick) {
+      //   element.removeEventListener('click', oldProps.onClick)
+      // }
+      if (props.onClick) {
+        $fragment.addEventListener('click', props.onClick)
+      }
+      updateAttrs($fragment, getAttrs(props))
+      children
+        .filter(notEmptyNode)
+        .forEach(child => {
+          const $child = _render(child, $fragment)
+          if ($child.nodeType === 3) {
+            // mount text node
+            $fragment.appendChild($child)
+          }
+        })
+      // mount element
+      $mountTarget.appendChild($fragment)
+      return $fragment
+    }
+    if (typeof type === 'function') {
+      // let cached = cachedEvals.get(vnode)
+      // if (!cached) {
+
+      //   || evalVnode(vnode)
+      // }
+      const $dom = _render(evaled.evaled, $mountTarget)
+      evaled.$ref = $dom
+      return $dom
+    }
+    console.warn('render: Invalid type found', type)
+    return
   }
-  console.warn('Invalid type found', type)
-  return
+
+  _render(vnode2, $mountTarget2, prevEvaled2)
+
+  // if (children.length === oldChildren.length) {
+  //   // assume children have the same order and array of elements all have a valid key
+  //   if (props.children) {
+  //     children.forEach((child, index) => {
+  //       const oldChild = oldChildren[index]
+  //       // update text node
+  //       if (!isVdomObject(child)) {
+  //         console.log(children, oldChildren)
+  //         if (child !== oldChild) {
+  //           element.childNodes[index].textContent = child
+  //         }
+  //         return
+  //       }
+  //       // update non-text node
+  //       const { type } = child
+  //       if (type !== oldChild.type) {
+  //         // TODO
+  //         // element.childNodes[index] = evalVdomDeep(child)
+  //         return
+  //       }
+  //       render(element.childNodes[index], child, oldChild)
+  //     })
+  //   }
+  //   return
+  // }
+  // console.log('TODO: update children of diff len')
 }
 
-export function render(vdom, mountTarget) {
-  const dom = vdomToDom(vdom)
-  mountTarget.innerHTML = ''
-  mountTarget.append(dom)
+function handleSetState(vnode) {
+  return () => {
+    /**
+     * THE MAGIC HAPPENS HERE TM
+     */
+    const cached = cachedEvals.get(vnode)
+    const newEvaled = {
+      ...cached,
+      evaled: cached.instance.render()
+    }
+    const upperKey = getUpperScope(cachedEvals, vnode)
+    render(newEvaled, cachedEvals.get(upperKey).$ref, cached)
+  }
+}
+
+/**
+ * @param {Object} vnode
+ * @param {String | Function} vnode.type
+ * @param {String | Number} vnode.key
+ * @param {Object} vnode.props
+ * @param {{} | [] | String} vnode.props.children
+ */
+function evalVnode(vnode) {
+  const { type, props } = vnode
+  if (typeof type !== 'function') {
+    return vnode
+  }
+  if (isClassComponent(type)) {
+    const cached = cachedEvals.get(vnode)
+    const instance = cached
+      ? cached.instance
+      : new type(props)
+    if (cached) {
+      // update existing instance props
+      instance.props = props
+    } else {
+      // we only have to register wather once
+      instance.setWatcher(handleSetState(vnode))
+    }
+    const evaled = instance.render()
+    const newCache = {
+      ...cached,
+      evaled,
+      instance,
+    }
+    cachedEvals.set(vnode, newCache)
+    return newCache
+  }
+  const evaled = vnode.type(vnode.props)
+  const newCache = { evaled }
+  cachedEvals.set(vnode, newCache)
+  return newCache
 }
