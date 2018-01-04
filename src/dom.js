@@ -7,7 +7,8 @@ import {
   getAttrs,
   notEmptyNode,
   isTextVnode,
-  updateAttrs
+  updateAttrs,
+  getUpperScope
 } from './utils'
 
 /**
@@ -16,13 +17,18 @@ import {
  */
 const cachedEvals = new IterableWeakMap()
 
-export function render(vnode2, $mountTarget2) {
-  if ($mountTarget2) {
-    // clear root
+/**
+ * 
+ * @param {*} vnode2 
+ * @param {*} $mountTarget2
+ * @param {Object} prevEvaled2
+ */
+export function render(vnode2, $mountTarget2, prevEvaled2) {
+  if (!prevEvaled) {
     $mountTarget2.innerHTML = ''
   }
 
-  const _render = (vnode, $mountTarget) => {
+  const _render = (vnode, $mountTarget, prevEvaled) => {
     if (isTextVnode(vnode)) {
       const textNode = document.createTextNode(vnode.toString())
       return textNode
@@ -54,7 +60,11 @@ export function render(vnode2, $mountTarget2) {
       return $fragment
     }
     if (typeof type === 'function') {
-      const evaled = cachedEvals.get(vnode) || evalVnode(vnode)
+      // let cached = cachedEvals.get(vnode)
+      // if (!cached) {
+
+      //   || evalVnode(vnode)
+      // }
       const $dom = _render(evaled.evaled, $mountTarget)
       evaled.$ref = $dom
       return $dom
@@ -63,7 +73,7 @@ export function render(vnode2, $mountTarget2) {
     return
   }
 
-  _render(vnode2, $mountTarget2)
+  _render(vnode2, $mountTarget2, prevEvaled2)
 
   // if (children.length === oldChildren.length) {
   //   // assume children have the same order and array of elements all have a valid key
@@ -103,8 +113,8 @@ function handleSetState(vnode) {
       ...cached,
       evaled: cached.instance.render()
     }
-    // TODO
-    render(newEvaled, cached.$ref)
+    const upperKey = getUpperScope(cachedEvals, vnode)
+    render(newEvaled, cachedEvals.get(upperKey).$ref, cached)
   }
 }
 

@@ -21,15 +21,23 @@ render(<App />, document.getElementById('root2'))
 //   )
 // }
 
-// const Test2 = () => {
-//   return (
-//     <div>
-//       <div>0</div>
-//       <div>1</div>
-//       <div>2</div>
-//     </div>
-//   )
-// }
+const Test2 = () => {
+  const flag = true
+  return (
+    <div>
+      {
+        flag
+          ? (
+            <div>0</div>
+          )
+          : (
+            <div>1</div>
+          )
+      }
+      <div>2</div>
+    </div>
+  )
+}
 
 // const Test3 = () => {
 //   return (
@@ -44,5 +52,5 @@ render(<App />, document.getElementById('root2'))
 //     </div>
 //   )
 // }
-// console.log(Test2())
+console.log(Test2())
 // console.log(Test3())

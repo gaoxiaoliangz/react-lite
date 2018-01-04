@@ -343,7 +343,7 @@ export default (React, Component, isFb = false) => {
       }
     }
 
-    return App
+    return App4
   }
 
   const beforeRun = () => {

@@ -57,11 +57,11 @@ export function isTextVnode(vnode) {
   return !isVnodeObject(vnode)
 }
 
-export function hasChildDeep(vdom, child) {
-  if (!isVnodeObject(vdom)) {
+export function hasChildDeep(vnode, child) {
+  if (!isVnodeObject(vnode)) {
     return false
   }
-  const { props: { children } } = vdom
+  const { props: { children } } = vnode
   if (children) {
     const children2 = Array.isArray(children) ? children : [children]
     return children2.some(child2 => {
@@ -74,11 +74,11 @@ export function hasChildDeep(vdom, child) {
   return false
 }
 
-export function getUpperScope(evaledNodes, vdom) {
+export function getUpperScope(evaledNodes, vnode) {
   let found
   evaledNodes.forEach(node => {
-    if (!found && node.key !== vdom) {
-      const result = hasChildDeep(node.value, vdom)
+    if (!found && node.key !== vnode) {
+      const result = hasChildDeep(node.value.evaled, vnode)
       if (result) {
         found = node.key
       }
