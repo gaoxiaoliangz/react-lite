@@ -1,3 +1,3 @@
-# Virtual Dom Lite
+# React lite
 
 > In development

@@ -1,5 +1,5 @@
 {
-  "name": "virtual-dom-lite",
+  "name": "react-lite",
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gaoxiaoliangz/virtual-dom-lite.git"
+    "url": "git+https://github.com/gaoxiaoliangz/react-lite.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gaoxiaoliangz/virtual-dom-lite/issues"
+    "url": "https://github.com/gaoxiaoliangz/react-lite/issues"
   },
-  "homepage": "https://github.com/gaoxiaoliangz/virtual-dom-lite#readme",
+  "homepage": "https://github.com/gaoxiaoliangz/react-lite#readme",
   "dependencies": {
     "lodash": "^4.17.4",
     "react": "^16.2.0",
