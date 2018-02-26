@@ -19,7 +19,6 @@ class VirtualNode {
   }
 
   _create(reactElement0) {
-    // console.log(reactElement0)
     let reactElement = reactElement0
     
     // todo
@@ -34,18 +33,6 @@ class VirtualNode {
         const instance = new type(props) // eslint-disable-line
         this.classComponentInstance = instance
         reactElement = instance.render()
-        instance.setWatcher(() => {
-          /**
-           * THE MAGIC HAPPENS HERE
-           */
-          const node = createElement(instance.render())
-          node.reactElement = reactElement0
-          node.classComponentInstance = instance
-          node.onStateChange = this.onStateChange
-          if (this.onStateChange) {
-            this.onStateChange(node)
-          }
-        })
       } else {
         reactElement = type(props)
       }
