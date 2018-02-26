@@ -133,3 +133,8 @@ export function getNodeIndex(node) {
   }
   return -1
 }
+
+export function removeNode(node) {
+  const parent = node.parentNode
+  parent.removeChild(node)
+}

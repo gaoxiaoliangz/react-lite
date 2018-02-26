@@ -1,7 +1,7 @@
 import { createElement } from './react-element'
 import Component from './react-component'
 import { Reconciler } from './reconcile'
-import { createElement as vdomCreateElement } from './virtual-node'
+import { createElement as vCreateElement } from './virtual-node'
 
 const React = {
   createElement,
@@ -9,8 +9,9 @@ const React = {
 }
 
 export const render = (reactElement, target) => {
+  target.innerHTML = null // eslint-disable-line
   const r = new Reconciler()
-  const v = vdomCreateElement(reactElement)
+  const v = vCreateElement(reactElement)
   r.start(target, v)
 }
 

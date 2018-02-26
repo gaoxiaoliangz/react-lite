@@ -87,17 +87,17 @@ export default (React, Component, isFb = false) => {
           <div>
             <div onClick={this.handleClick}>
               <div>yes?</div>
-              {/* {
+              {
                 this.state.flag
                   ? (
-                    <div onClick={this.handleClick}>with div</div>
+                    <div >yes</div>
                   )
                   : (
-                    <span onClick={this.handleClick}>with span</span>
+                    <span >no</span>
                   )
-              } */}
+              }
               <div>
-                update textContent
+                update textContent 
                 {
                   this.state.flag ? 'with div' : 'with span'
                 }

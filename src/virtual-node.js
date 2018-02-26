@@ -64,7 +64,15 @@ class VirtualNode {
 
   appendChild(node) {
     node.parentNode = this // eslint-disable-line
+    node.previousSibling = node.parentNode.lastChild // eslint-disable-line
+    if (node.previousSibling) {
+      node.previousSibling.nextSibling = node // eslint-disable-line
+    }
     this.childNodes.push(node)
+  }
+
+  get lastChild() {
+    return this.childNodes[this.childNodes.length - 1]
   }
 }
 

@@ -1,5 +1,4 @@
-import { IterableWeakMap, TwoWayWeakMap, arrayGuard, updateAttrs, getAttrs, getNodeIndex } from './utils'
-import { CLASS_COMPONENT_TYPE } from './react-component'
+import { TwoWayWeakMap, updateAttrs, getAttrs, getNodeIndex, removeNode } from './utils'
 import { createElement as vCreateElement } from './virtual-node'
 
 export class Reconciler {
@@ -7,7 +6,7 @@ export class Reconciler {
     this._twoWayNodeMap = new TwoWayWeakMap()
   }
 
-  _createNode(parentNode, vnode) {
+  _createNode(parentNode, vnode, nextSiblingNode) {
     if (vnode.nodeType === 1) {
       const element = document.createElement(vnode.tagName)
 
@@ -31,7 +30,7 @@ export class Reconciler {
         })
       }
 
-      parentNode.appendChild(element)
+      parentNode.insertBefore(element, nextSiblingNode)
       vnode.childNodes.forEach(childNode => {
         this._createNode(element, childNode)
       })
@@ -39,24 +38,28 @@ export class Reconciler {
     } else if (vnode.nodeType === 3) {
       const textNode = document.createTextNode(vnode.textContent)
       this._twoWayNodeMap.set(vnode, textNode)
-      parentNode.appendChild(textNode)
+      parentNode.insertBefore(textNode, nextSiblingNode)
     }
+  }
+
+  _getNode(vnode) {
+    return this._twoWayNodeMap.get(vnode)
   }
 
   _updateNode(parentNode, vnode, prevVnode) {
     // todo attrs
-
-    // update node, vnode relations
-
-
     if ((vnode.reactElement !== prevVnode.reactElement || vnode.tagName !== prevVnode.tagName) && vnode.nodeType !== 3) {
-      // todo
-      console.log('todo: complete update')
+      // a complete update
+      const node = this._getNode(prevVnode)
+      this._createNode(parentNode, vnode, node.nextSibling)
+      this._removeNode(node)
     } else if (vnode.nodeType === 3) {
+      // update text node
       if (vnode.textContent !== prevVnode.textContent) {
         this._updateTextContent(vnode, prevVnode)
       }
     } else if (vnode.nodeType === 1) {
+      // update element node
       // todo: attrs
       const parentNode2 = this._twoWayNodeMap.get(prevVnode)
       vnode.childNodes.forEach((childVnode, index) => {
@@ -65,8 +68,7 @@ export class Reconciler {
       })
       this._updateNodeMap(vnode, prevVnode)
     } else {
-      // todo
-      console.error('todo: should not be here!!!')
+      // todo: other type of nodes
     }
   }
 
@@ -87,8 +89,9 @@ export class Reconciler {
 
   }
 
-  _removeNode() {
-
+  _removeNode(node) {
+    removeNode(node)
+    // todo: node unmount
   }
 
   _updateNodeMap(vnode, prevVnode) {
