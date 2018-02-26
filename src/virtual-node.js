@@ -1,4 +1,4 @@
-import { IterableWeakMap, arrayGuard, updateAttrs, getAttrs, getNodeIndex, uuid } from './utils'
+import { arrayGuard, getAttrs } from './utils'
 import { CLASS_COMPONENT_TYPE } from './react-component'
 
 class VirtualNode {
@@ -11,7 +11,9 @@ class VirtualNode {
     this.reactElement = null
     this.classComponentInstance = null
     this.nodeId = null
-    
+    this.attributes = {}
+    this.key = null
+
     // events
     this.onClick = null
 
@@ -38,8 +40,9 @@ class VirtualNode {
       }
       type = reactElement.type
       props = reactElement.props
-      key = reactElement.key
+      key = reactElement.key || key
     }
+    this.key = key
 
     // todo
     if (typeof reactElement === 'string') {
@@ -50,9 +53,8 @@ class VirtualNode {
 
     this.nodeType = 1
     this.tagName = type.toUpperCase()
+    this.attributes = getAttrs(props)
 
-    // todo
-    // updateAttrs($node, getAttrs(props))
     if (props.onClick) {
       this.onClick = props.onClick
     }

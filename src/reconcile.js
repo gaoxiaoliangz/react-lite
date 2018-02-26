@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { TwoWayWeakMap, updateAttrs, getAttrs, getNodeIndex, removeNode } from './utils'
 import { createElement as vCreateElement } from './virtual-node'
 
@@ -9,7 +10,7 @@ export class Reconciler {
   _createNode(parentNode, vnode, nextSiblingNode) {
     if (vnode.nodeType === 1) {
       const element = document.createElement(vnode.tagName)
-
+      updateAttrs(element, vnode.attributes)
       if (vnode.classComponentInstance) {
         let lastVnode
         const instance = vnode.classComponentInstance
@@ -47,7 +48,6 @@ export class Reconciler {
   }
 
   _updateNode(parentNode, vnode, prevVnode) {
-    // todo attrs
     if ((vnode.reactElement !== prevVnode.reactElement || vnode.tagName !== prevVnode.tagName) && vnode.nodeType !== 3) {
       // a complete update
       const node = this._getNode(prevVnode)
@@ -60,7 +60,10 @@ export class Reconciler {
       }
     } else if (vnode.nodeType === 1) {
       // update element node
-      // todo: attrs
+      const node = this._getNode(prevVnode)
+      if (!_.isEqual(vnode.attributes, prevVnode.attributes)) {
+        updateAttrs(node, vnode.attributes)
+      }
       const parentNode2 = this._twoWayNodeMap.get(prevVnode)
       vnode.childNodes.forEach((childVnode, index) => {
         // todo: key

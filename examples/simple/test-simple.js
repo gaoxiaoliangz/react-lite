@@ -96,7 +96,7 @@ export default (React, Component, isFb = false) => {
                     <span >no</span>
                   )
               }
-              <div>
+              <div id="label" className={this.state.flag ? 'yes' : 'no'}>
                 update textContent 
                 {
                   this.state.flag ? 'with div' : 'with span'
