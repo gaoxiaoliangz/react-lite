@@ -149,10 +149,18 @@ export default (React, Component, isFb = false) => {
           {
             _.times(5).map(n => {
               return (
-                <div>{n}</div>
+                <div key={n}>{n}</div>
               )
             })
           }
+          {
+            [
+              <div key={1}>0</div>,
+              <div key={2}>1</div>,
+            ]
+          }
+          <div>1</div>
+          <div>2</div>
         </div>
       )
     }
@@ -188,7 +196,7 @@ export default (React, Component, isFb = false) => {
         <div>
           {/* <Test /> */}
           {/* <Test2 /> */}
-          <Test4 />
+          <Test3 />
         </div>
       )
     }

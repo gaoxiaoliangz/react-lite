@@ -20,17 +20,15 @@ export function isReactTextElement(input) {
 }
 
 export function createElement(type, props, ...children) {
-  const { key } = props || {}
-
   // a simple validation (key validation to be specific)
   children.forEach(child => {
     if (Array.isArray(child)) {
-      const keys = child.filter(isReactElement).map(v => v.key)
-      if (keys.length !== _.union(keys).length) {
+      const keys = child.filter(isReactElement).map(v => v.key).filter(key => !_.isUndefined(key))
+      if (keys.length !== 0 && keys.length !== _.union(keys).length) {
         // TODO: show exactly which key
         console.warn('Encountered two children with the same key')
       }
-      if (keys.length !== keys.filter(k => typeof k !== 'undefined').length) {
+      if (keys.length === 0 || keys.length !== keys.filter(k => typeof k !== 'undefined').length) {
         // TODO: print component trace
         console.warn('Each child in an array or iterator should have a unique "key" prop.')
       }
@@ -45,6 +43,6 @@ export function createElement(type, props, ...children) {
         children: children.length === 1 ? children[0] : children
       }
     },
-    key,
+    key: _.get(props, 'key'),
   }
 }
