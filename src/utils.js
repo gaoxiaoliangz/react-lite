@@ -2,17 +2,24 @@ import _ from 'lodash'
 
 export class TwoWayWeakMap {
   constructor() {
-    this._wm1 = new WeakMap()
-    this._wm2 = new WeakMap()
+    this._wm = new WeakMap()
   }
 
-  set(key, val) {
-    this._wm1.set(key, val)
-    this._wm2.set(val, key)
+  set(ref1, ref2) {
+    this._wm.set(ref1, ref2)
+    this._wm.set(ref2, ref1)
+  }
+
+  remove(ref) {
+    const ref2 = this.get(ref)
+    this._wm.delete(ref)
+    if (ref2) {
+      this._wm.delete(ref2)
+    }
   }
 
   get(key) {
-    return this._wm1.get(key) || this._wm2.get(key)
+    return this._wm.get(key)
   }
 }
 
@@ -45,7 +52,7 @@ export class IterableWeakMap {
   }
 }
 
-export function guid() {
+export function uuid() {
   const s4 = () => {
     return Math.floor((1 + Math.random()) * 0x10000)
       .toString(16)

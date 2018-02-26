@@ -1,4 +1,4 @@
-import { IterableWeakMap, arrayGuard, updateAttrs, getAttrs, getNodeIndex } from './utils'
+import { IterableWeakMap, arrayGuard, updateAttrs, getAttrs, getNodeIndex, uuid } from './utils'
 import { CLASS_COMPONENT_TYPE } from './react-component'
 
 class VirtualNode {
@@ -10,7 +10,8 @@ class VirtualNode {
     this.childNodes = []
     this.reactElement = null
     this.classComponentInstance = null
-
+    this.nodeId = null
+    
     // events
     this.onClick = null
 
@@ -30,10 +31,9 @@ class VirtualNode {
     if (typeof type === 'function') {
       this.reactElement = reactElement
       if (type.type === CLASS_COMPONENT_TYPE) {
-        const instance = new type(props)
+        const instance = new type(props) // eslint-disable-line
         this.classComponentInstance = instance
         reactElement = instance.render()
-        // console.log(reactElement0)
         instance.setWatcher(() => {
           /**
            * THE MAGIC HAPPENS HERE
@@ -76,11 +76,16 @@ class VirtualNode {
   }
 
   appendChild(node) {
-    node.parentNode = this
+    node.parentNode = this // eslint-disable-line
     this.childNodes.push(node)
   }
 }
 
+let nodeId = 0
+
 export const createElement = (reactElement) => {
-  return new VirtualNode(reactElement)
+  const node = new VirtualNode(reactElement)
+  node.nodeId = nodeId
+  nodeId++
+  return node
 }

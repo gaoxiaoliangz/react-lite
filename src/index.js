@@ -1,7 +1,7 @@
 import { createElement } from './react-element'
 import Component from './react-component'
 import { Reconciler } from './reconcile'
-import { createElement as vdomCreateElement } from './virtual-dom'
+import { createElement as vdomCreateElement } from './virtual-node'
 
 const React = {
   createElement,
