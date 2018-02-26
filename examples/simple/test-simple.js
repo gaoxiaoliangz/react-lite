@@ -109,14 +109,95 @@ export default (React, Component, isFb = false) => {
       }
     }
 
-    return App4
+    const Test = () => {
+      return (
+        <div>
+          {0}
+          {1}
+          {undefined}
+          {null}
+          {true}
+          {false}
+          {[]}
+          end
+        </div>
+      )
+    }
+
+    const Test2 = () => {
+      const flag = true
+      return (
+        <div>
+          {
+            flag
+              ? (
+                <div>0</div>
+              )
+              : (
+                <div>1</div>
+              )
+          }
+          <div>2</div>
+        </div>
+      )
+    }
+
+    const Test3 = () => {
+      return (
+        <div>
+          {0}
+          {
+            _.times(5).map(n => {
+              return (
+                <div>{n}</div>
+              )
+            })
+          }
+        </div>
+      )
+    }
+
+    const Test4 = () => {
+      return (
+        <div>
+          {1}
+          {
+            _.times(5).map((n, i) => {
+              return (
+                <div key={i}>{n}</div>
+              )
+            })
+          }
+        </div>
+      )
+    }
+
+    const Test5 = () => {
+      return (
+        <div>
+          {1}
+          {[
+            0, 1, 2, [2, 3]
+          ]}
+        </div>
+      )
+    }
+
+    const App5 = () => {
+      return (
+        <div>
+          {/* <Test /> */}
+          {/* <Test2 /> */}
+          <Test4 />
+        </div>
+      )
+    }
+
+    return App5
   }
 
   const beforeRun = () => {
     const App = container()
-    // console.log('---', isFb ? 'fb here' : 'my own', '---')
-    // console.log('App children', App().props.children)
-    // console.log('App inside', App())
     return App
   }
 

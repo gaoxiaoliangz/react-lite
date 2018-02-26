@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { TwoWayWeakMap, updateAttrs, getAttrs, getNodeIndex, removeNode } from './utils'
+import { TwoWayWeakMap, updateAttrs, getNodeIndex, removeNode } from './utils'
 import { createElement as vCreateElement } from './virtual-node'
 
 export class Reconciler {
@@ -86,10 +86,6 @@ export class Reconciler {
       parentNode.childNodes[nodeIndex].textContent = vnode.textContent
     }
     this._updateNodeMap(vnode, prevVnode)
-  }
-
-  _updateAttributes() {
-
   }
 
   _removeNode(node) {

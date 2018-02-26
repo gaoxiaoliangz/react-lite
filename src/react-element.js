@@ -1,5 +1,24 @@
 import _ from 'lodash'
 
+export function notEmpty(input) {
+  return ![undefined, null, false, true].includes(input)
+}
+
+export function isReactElement(element) {
+  if (notEmpty(element)) {
+    return typeof element === 'object' && element.type && element.props
+  }
+  return false
+}
+
+export function isReactTextElement(input) {
+  const type = typeof input
+  if (!isReactElement(input) && type === 'object' && input !== null && !Array.isArray(input)) {
+    throw new Error(`Objects are not valid as a React child (found: object with keys ${JSON.stringify(input)}). If you meant to render a collection of children, use an array instead.`)
+  }
+  return type === 'string' || type === 'number'
+}
+
 export function createElement(type, props, ...children) {
   const { key } = props || {}
 
@@ -11,7 +30,7 @@ export function createElement(type, props, ...children) {
         // TODO: show exactly which key
         console.warn('Encountered two children with the same key')
       }
-      if (keys.length !== keys.filter(key => typeof key !== 'undefined').length) {
+      if (keys.length !== keys.filter(k => typeof k !== 'undefined').length) {
         // TODO: print component trace
         console.warn('Each child in an array or iterator should have a unique "key" prop.')
       }
@@ -29,18 +48,3 @@ export function createElement(type, props, ...children) {
     key,
   }
 }
-
-export function notEmpty(input) {
-  return ![undefined, null, false, true].includes(input)
-}
-
-export function isReactElement(element) {
-  if (notEmpty(element)) {
-    return typeof element === 'object' && element.type && element.props
-  }
-  return false
-}
-
-// export function isTextVnode(vnode) {
-//   return !isVnodeObject(vnode)
-// }

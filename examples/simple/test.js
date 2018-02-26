@@ -1,10 +1,7 @@
 import _ from 'lodash'
-import { Provider } from 'react-redux'
+import { Provider, connect } from 'react-redux'
 import { createStore, combineReducers } from 'redux'
-import { connect } from 'react-redux'
 import { guid } from './utils'
-
-// use weakmap to store evaled components
 
 const updateCount = count => {
   return {
@@ -29,7 +26,6 @@ const store = createStore(reducers)
 
 export default (React, Component, isFb = false) => {
   const container = () => {
-
     /** start of common components */
     const Button = (props) => {
       return (
@@ -348,9 +344,6 @@ export default (React, Component, isFb = false) => {
 
   const beforeRun = () => {
     const App = container()
-    // console.log('---', isFb ? 'fb here' : 'my own', '---')
-    // console.log('App children', App().props.children)
-    // console.log('App inside', App())
     return App
   }
 

@@ -56,7 +56,9 @@
     "no-nested-ternary": [0],
     "no-use-before-define": [2, { "variables": false }],
     "consistent-return": [2],
-    "class-methods-use-this": [0]
+    "class-methods-use-this": [0],
+    "react/no-multi-comp": [0],
+    "react/no-array-index-key": [0]
   }
 }
   

@@ -1,5 +1,6 @@
-import { arrayGuard, getAttrs } from './utils'
-import { CLASS_COMPONENT_TYPE } from './react-component'
+import _ from 'lodash'
+import { arrayGuard, getAttrs, isClassComponent } from './utils'
+import { isReactTextElement, isReactElement } from './react-element'
 
 class VirtualNode {
   constructor(reactElement) {
@@ -13,6 +14,7 @@ class VirtualNode {
     this.nodeId = null
     this.attributes = {}
     this.key = null
+    this.valid = true
 
     // events
     this.onClick = null
@@ -22,16 +24,11 @@ class VirtualNode {
 
   _create(reactElement0) {
     let reactElement = reactElement0
+    let { type, props, key } = reactElement || {}
     
-    // todo
-    if (!reactElement && reactElement !== '') {
-      return
-    }
-
-    let { type, props, key } = reactElement
     if (typeof type === 'function') {
       this.reactElement = reactElement
-      if (type.type === CLASS_COMPONENT_TYPE) {
+      if (isClassComponent(type)) {
         const instance = new type(props) // eslint-disable-line
         this.classComponentInstance = instance
         reactElement = instance.render()
@@ -42,15 +39,19 @@ class VirtualNode {
       props = reactElement.props
       key = reactElement.key || key
     }
-    this.key = key
 
-    // todo
-    if (typeof reactElement === 'string') {
+    if (isReactTextElement(reactElement)) {
       this.nodeType = 3
       this.textContent = reactElement
       return
     }
 
+    if (!isReactElement(reactElement) && !isReactTextElement(reactElement)) {
+      this.valid = false
+      return
+    }
+
+    this.key = key
     this.nodeType = 1
     this.tagName = type.toUpperCase()
     this.attributes = getAttrs(props)
@@ -58,9 +59,11 @@ class VirtualNode {
     if (props.onClick) {
       this.onClick = props.onClick
     }
-    arrayGuard(props.children).forEach(childElement => {
+    _.flattenDeep(arrayGuard(props.children)).forEach(childElement => {
       const node = createElement(childElement)
-      this.appendChild(node)
+      if (node.valid) {
+        this.appendChild(node)
+      }
     })
   }
 

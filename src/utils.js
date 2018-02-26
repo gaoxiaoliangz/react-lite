@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { CLASS_COMPONENT_TYPE } from './react-component'
 
 export class TwoWayWeakMap {
   constructor() {
@@ -61,42 +62,8 @@ export function uuid() {
   return s4() + s4()
 }
 
-// TODO: a more general way to detect
 export function isClassComponent(v) {
-  if (typeof v !== 'function') {
-    return false
-  }
-  return v.__type === 'class-component'
-}
-
-export function hasChildDeep(vnode, child) {
-  if (!isVnodeObject(vnode)) {
-    return false
-  }
-  const { props: { children } } = vnode
-  if (children) {
-    const children2 = Array.isArray(children) ? children : [children]
-    return children2.some(child2 => {
-      if (child2 === child) {
-        return true
-      }
-      return hasChildDeep(child2, child)
-    })
-  }
-  return false
-}
-
-export function getUpperScope(evaledNodes, vnode) {
-  let found
-  evaledNodes.forEach(node => {
-    if (!found && node.key !== vnode) {
-      const result = hasChildDeep(node.value.evaled, vnode)
-      if (result) {
-        found = node.key
-      }
-    }
-  })
-  return found
+  return typeof v === 'function' && v.type === CLASS_COMPONENT_TYPE
 }
 
 export function getAttrs(props) {
@@ -112,7 +79,7 @@ export function getAttrs(props) {
 }
 
 export function arrayGuard(arrOrEle) {
-  if (arrOrEle) {
+  if (!_.isUndefined(arrOrEle)) {
     return Array.isArray(arrOrEle) ? arrOrEle : [arrOrEle]
   }
   return []
