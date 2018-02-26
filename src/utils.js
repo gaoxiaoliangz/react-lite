@@ -1,5 +1,21 @@
 import _ from 'lodash'
 
+export class TwoWayWeakMap {
+  constructor() {
+    this._wm1 = new WeakMap()
+    this._wm2 = new WeakMap()
+  }
+
+  set(key, val) {
+    this._wm1.set(key, val)
+    this._wm2.set(val, key)
+  }
+
+  get(key) {
+    return this._wm1.get(key) || this._wm2.get(key)
+  }
+}
+
 export class IterableWeakMap {
   constructor() {
     this._wm = new WeakMap()
@@ -44,17 +60,6 @@ export function isClassComponent(v) {
     return false
   }
   return v.__type === 'class-component'
-}
-
-export function isVnodeObject(vdom) {
-  if (notEmptyNode(vdom)) {
-    return typeof vdom === 'object' && vdom.type && vdom.props
-  }
-  return false
-}
-
-export function isTextVnode(vnode) {
-  return !isVnodeObject(vnode)
 }
 
 export function hasChildDeep(vnode, child) {
@@ -106,12 +111,18 @@ export function arrayGuard(arrOrEle) {
   return []
 }
 
-export function notEmptyNode(node) {
-  return ![undefined, null, false, true].includes(node)
-}
-
 export function updateAttrs($dom, attrsObject) {
   _.forEach(attrsObject, (v, k) => {
     $dom.setAttribute(k, v)
   })
+}
+
+export function getNodeIndex(node) {
+  const parent = node.parentNode
+  for (let index = 0; parent.childNodes.length > index; index++) {
+    if (node === parent.childNodes[index]) {
+      return index
+    }
+  }
+  return -1
 }

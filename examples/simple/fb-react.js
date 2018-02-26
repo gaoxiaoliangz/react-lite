@@ -1,9 +1,10 @@
 import _ from 'lodash'
 import React from 'react'
 import { render } from 'react-dom'
-import test from './test'
+// import test from './test'
+import test0 from './test-simple'
 
-const App = test(React, React.Component, true)
+const App = test0(React, React.Component, true)
 
 render(<App />, document.getElementById('root2'))
 
@@ -21,23 +22,23 @@ render(<App />, document.getElementById('root2'))
 //   )
 // }
 
-const Test2 = () => {
-  const flag = true
-  return (
-    <div>
-      {
-        flag
-          ? (
-            <div>0</div>
-          )
-          : (
-            <div>1</div>
-          )
-      }
-      <div>2</div>
-    </div>
-  )
-}
+// const Test2 = () => {
+//   const flag = true
+//   return (
+//     <div>
+//       {
+//         flag
+//           ? (
+//             <div>0</div>
+//           )
+//           : (
+//             <div>1</div>
+//           )
+//       }
+//       <div>2</div>
+//     </div>
+//   )
+// }
 
 // const Test3 = () => {
 //   return (
@@ -52,5 +53,5 @@ const Test2 = () => {
 //     </div>
 //   )
 // }
-console.log(Test2())
+// console.log(Test2())
 // console.log(Test3())

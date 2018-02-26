@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { isVnodeObject } from './utils';
 
 export function createElement(type, props, ...children) {
   const { key } = props || {}
@@ -7,7 +6,7 @@ export function createElement(type, props, ...children) {
   // a simple validation (key validation to be specific)
   children.forEach(child => {
     if (Array.isArray(child)) {
-      const keys = child.filter(isVnodeObject).map(v => v.key)
+      const keys = child.filter(isReactElement).map(v => v.key)
       if (keys.length !== _.union(keys).length) {
         // TODO: show exactly which key
         console.warn('Encountered two children with the same key')
@@ -31,26 +30,17 @@ export function createElement(type, props, ...children) {
   }
 }
 
-export class Component {
-  constructor(props) {
-    this.props = props
-  }
-
-  setWatcher(cb) {
-    this.watcherCb = cb
-  }
-
-  setState(state, cb) {
-    this.state = state
-    console.info('setState', state)
-    this.watcherCb()
-    if (cb) cb()
-  }
+export function notEmpty(input) {
+  return ![undefined, null, false, true].includes(input)
 }
 
-Component.__type = 'class-component'
-
-export default {
-  createElement,
-  Component
+export function isReactElement(element) {
+  if (notEmpty(element)) {
+    return typeof element === 'object' && element.type && element.props
+  }
+  return false
 }
+
+// export function isTextVnode(vnode) {
+//   return !isVnodeObject(vnode)
+// }
