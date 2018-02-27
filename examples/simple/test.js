@@ -174,6 +174,18 @@ export default (React, Component, isFb = false) => {
       )
     })
 
+    // class KeyTest extends React.Component {
+    //   render() {
+    //     return (
+    //       <div>
+    //         <div>a</div>
+    //         <div>b</div>
+    //         <div>c</div>
+    //       </div>
+    //     )
+    //   }
+    // }
+
     const renderTests = () => {
       return (
         <div className="tests-inner">
@@ -238,10 +250,17 @@ export default (React, Component, isFb = false) => {
               {'text 2'}
             </div>
           </TestContainer>
-          <TestContainer disabled={true} desc="render number">
-            <ul>
-              {_.times(5).map(n => <li key={n}>{n}</li>)}
-            </ul>
+          <TestContainer disabled={false} desc="render number">
+            <div>
+              <ul>
+                {_.times(5).map(n => <li key={n}>{n}</li>)}
+              </ul>
+              {
+                [
+                  0, 1, 2, <div key="a">3</div>
+                ]
+              }
+            </div>
           </TestContainer>
           <Sep />
           <TestContainer desc="should render class component correctly and respond to clicks">
@@ -258,6 +277,11 @@ export default (React, Component, isFb = false) => {
           </TestContainer>
           <TestContainer disabled={true} desc="should work fine with react redux">
             <UpdateCountWithRedux />
+          </TestContainer>
+          <TestContainer desc="should not warn about keys">
+            <div>a</div>
+            <div>b</div>
+            <div>c</div>
           </TestContainer>
         </div>
       )
@@ -339,7 +363,7 @@ export default (React, Component, isFb = false) => {
       }
     }
 
-    return App4
+    return App
   }
 
   const beforeRun = () => {

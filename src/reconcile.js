@@ -50,6 +50,12 @@ export class Reconciler {
   _updateNode(parentNode, vnode, prevVnode) {
     if ((vnode.reactElement !== prevVnode.reactElement || vnode.tagName !== prevVnode.tagName) && vnode.nodeType !== 3) {
       // a complete update
+      // console.log('complete update', vnode, prevVnode)
+      // console.log(vnode.reactElement !== prevVnode.reactElement)
+      // console.log('tag', vnode.tagName !== prevVnode.tagName)
+      // setTimeout(() => {
+      //   console.log('tag to', vnode.tagName !== prevVnode.tagName)
+      // }, 200)
       const node = this._getNode(prevVnode)
       this._createNode(parentNode, vnode, node.nextSibling)
       this._removeNode(node)

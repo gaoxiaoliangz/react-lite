@@ -1,4 +1,4 @@
-import { createElement } from './react-element'
+import { createElementWithValidation as createElement } from './react-element'
 import Component from './react-component'
 import { Reconciler } from './reconcile'
 import { createElement as vCreateElement } from './virtual-node'
