@@ -1,6 +1,6 @@
 # React lite
 
-A simple implementation of react
+A simple implementation of react.
 
 The package is still under development, and only supports a few react features.
 
