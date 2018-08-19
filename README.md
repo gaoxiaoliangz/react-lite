@@ -1,8 +1,10 @@
-# React lite
+# README
 
-A simple implementation of react.
+## Why creating this repo
 
-The package is still under development, and only supports a few react features.
+I want to understand how react works, the best way to do it is to implement it my own way.
+
+The package is at very early stages of development, so only a handful of react features are supported.
 
 ## What's been included
 
