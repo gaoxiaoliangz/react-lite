@@ -1,11 +1,12 @@
 import MyReact, { render as myRender } from 'my-react'
 import React from 'react'
 import { render } from 'react-dom'
-import test from './test'
+import app from './app'
 import './style.css'
 
 const mount = ({ domNode, renderFn, react }) => {
-  renderFn(test(react), domNode)
+  const App = app(react)
+  renderFn(<App />, domNode)
 }
 
 mount({

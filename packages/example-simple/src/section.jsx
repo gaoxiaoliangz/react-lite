@@ -1,5 +1,4 @@
 export default React => {
-  // util components
   const Section = ({ title, children }) => {
     return (
       <div>
@@ -8,10 +7,5 @@ export default React => {
       </div>
     )
   }
-
-  return () => (
-    <div>
-      <Section title="render all kinds of stuff">test</Section>
-    </div>
-  )
+  return Section
 }
