@@ -4,12 +4,12 @@
   "private": true,
   "dependencies": {
     "@gxl/react-scripts": "2.2.5",
+    "lodash": "^4.17.4",
+    "my-react": "^0.1.0",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
-    "lodash": "^4.17.4",
     "react-redux": "^5.0.6",
-    "redux": "^3.7.2",
-    "my-react": "0.1.0"
+    "redux": "^3.7.2"
   },
   "scripts": {
     "start": "react-scripts start",
