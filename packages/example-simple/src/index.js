@@ -9,11 +9,11 @@ const mount = ({ domNode, renderFn, react }) => {
   renderFn(<App />, domNode)
 }
 
-mount({
-  domNode: document.getElementById('root'),
-  renderFn: myRender,
-  react: MyReact,
-})
+// mount({
+//   domNode: document.getElementById('root'),
+//   renderFn: myRender,
+//   react: MyReact,
+// })
 
 mount({
   domNode: document.getElementById('root2'),
