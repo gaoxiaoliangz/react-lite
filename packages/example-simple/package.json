@@ -1,11 +1,11 @@
 {
   "name": "example-simple",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@gxl/react-scripts": "2.2.5",
     "lodash": "^4.17.4",
-    "my-react": "^0.1.0",
+    "my-react": "^0.2.0",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "react-redux": "^5.0.6",
