@@ -9,4 +9,4 @@ const App = test(MyReact, React.Component, true)
 const App2 = test(React, React.Component, true)
 
 render(<App />, document.getElementById('root'))
-render(<App2 />, document.getElementById('root2'))
+myRender(<App2 />, document.getElementById('root2'))

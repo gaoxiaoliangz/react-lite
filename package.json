@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run example:simple",
-    "example:simple": "parcel examples/simple/index.html"
+    "start": "cd packages/example-simple && npm run start",
+    "build": "cd packages/my-react && yarn build"
   },
   "repository": {
     "type": "git",
