@@ -3,12 +3,19 @@ import React from 'react'
 import { render } from 'react-dom'
 import test from './test'
 import './style.css'
-// import test0 from './test-simple'
 
-const App = test(MyReact, MyReact.Component, true)
-const App2 = test(React, React.Component, true)
+const mount = ({ domNode, renderFn, react }) => {
+  renderFn(test(react), domNode)
+}
 
-myRender(<App />, document.getElementById('root'))
+mount({
+  domNode: document.getElementById('root'),
+  renderFn: myRender,
+  react: MyReact,
+})
 
-// fbs
-render(<App2 />, document.getElementById('root2'))
+mount({
+  domNode: document.getElementById('root2'),
+  renderFn: render,
+  react: React,
+})
