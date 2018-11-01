@@ -5,7 +5,12 @@ import app from './app'
 import './style.css'
 
 const mount = ({ domNode, renderFn, react }) => {
-  const App = app(react)
+  const App = app(react, {
+    render: renderFn,
+    onUpdate: () => {
+      console.log('update')
+    },
+  })
   renderFn(<App />, domNode)
 }
 

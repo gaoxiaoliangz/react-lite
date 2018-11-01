@@ -1,8 +1,21 @@
 * {
   box-sizing: border-box;
 }
+.root-wrap {
+  overflow-y: auto;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+body {
+}
 p {
   margin: 0;
+}
+.left, .right {
+  min-height: calc(100%);
 }
 .left {
   float: left;

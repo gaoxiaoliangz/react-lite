@@ -1,19 +1,33 @@
-// import section from './section'
-import renderPrimitive from './tests/renderPrimitive'
+import renderPrimitiveTest from './tests/renderPrimitiveTest'
+import setStateTest from './tests/setStateTest'
+import reactReduxTest from './tests/reactReduxTest'
+import reduxTest from './tests/reduxTest'
+import reconcileTest from './tests/reconcileTest'
 
-export default React => {
-  // const Section = section(React)
-  const RenderPrimitive = renderPrimitive(React)
+export default (React, { onUpdate }) => {
+  const RenderPrimitiveTest = renderPrimitiveTest(React)
+  const SetStateTest = setStateTest(React)
+  const ReduxTest = reduxTest(React)
+  const ReactReduxTest = reactReduxTest(React)
+  const ReconcileTest = reconcileTest(React)
+
   class App extends React.Component {
     componentDidMount() {
-      console.log(this.app.innerHTML)
+      onUpdate()
+    }
+
+    componentDidUpdate() {
+      onUpdate()
     }
 
     render() {
       return (
-        <div ref={ref => (this.app = ref)}>
-          {/* <Section title="render all kinds of stuff">test</Section> */}
-          <RenderPrimitive />
+        <div>
+          <RenderPrimitiveTest />
+          <SetStateTest />
+          <ReduxTest />
+          <ReactReduxTest />
+          <ReconcileTest />
         </div>
       )
     }

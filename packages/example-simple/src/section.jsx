@@ -1,7 +1,7 @@
 export default React => {
   const Section = ({ title, children }) => {
     return (
-      <div>
+      <div className="test-container">
         <h3>{title}</h3>
         {children}
       </div>
