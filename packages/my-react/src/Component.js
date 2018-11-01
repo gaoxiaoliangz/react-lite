@@ -1,5 +1,3 @@
-export const CLASS_COMPONENT_TYPE = 'class-component'
-
 export default class Component {
   constructor(props) {
     this.props = props
@@ -19,4 +17,4 @@ export default class Component {
   }
 }
 
-Component.type = CLASS_COMPONENT_TYPE
+Component._isClass = true

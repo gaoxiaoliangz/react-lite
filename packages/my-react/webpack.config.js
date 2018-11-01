@@ -14,13 +14,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|mjs|jsx)$/,
+        test: /\.(js|ts)$/,
         loader: require.resolve('babel-loader'),
         include: path.join(__dirname, 'src'),
       },
     ],
   },
   resolve: {
-    extensions: ['.wasm', '.mjs', '.js', '.json', '.jsx'],
+    extensions: ['.js', '.ts', '.json'],
   },
 }
