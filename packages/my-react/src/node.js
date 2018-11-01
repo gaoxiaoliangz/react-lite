@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { arrayGuard, getAttrs, isClassComponent } from './utils'
 import { isReactTextElement, isReactElement } from './react-element'
 
-class VirtualNode {
+class Node {
   constructor(reactElement) {
     this.onStateChange = null
     this.nodeType = null
@@ -83,14 +83,9 @@ class VirtualNode {
 
 let nodeId = 0
 
-export const createElement = (reactElement) => {
-  const node = new VirtualNode(reactElement)
+export const createNode = (reactElement) => {
+  const node = new Node(reactElement)
   node.nodeId = nodeId
   nodeId++
   return node
 }
-
-export const createNode = (reactElement) => {
-
-}
-
