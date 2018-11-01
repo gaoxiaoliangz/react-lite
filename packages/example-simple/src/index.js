@@ -11,14 +11,15 @@ const mount = ({ domNode, renderFn, react }) => {
       console.log('update')
     },
   })
+  console.log(<App />)
   renderFn(<App />, domNode)
 }
 
-// mount({
-//   domNode: document.getElementById('root'),
-//   renderFn: myRender,
-//   react: MyReact,
-// })
+mount({
+  domNode: document.getElementById('root'),
+  renderFn: myRender,
+  react: MyReact,
+})
 
 mount({
   domNode: document.getElementById('root2'),

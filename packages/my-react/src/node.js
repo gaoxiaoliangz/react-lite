@@ -89,3 +89,8 @@ export const createElement = (reactElement) => {
   nodeId++
   return node
 }
+
+export const createNode = (reactElement) => {
+
+}
+

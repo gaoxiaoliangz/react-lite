@@ -23,11 +23,13 @@ export default (React, { onUpdate }) => {
     render() {
       return (
         <div>
+          test
+          <span>span</span>
           <RenderPrimitiveTest />
-          <SetStateTest />
+          {/*<SetStateTest />
           <ReduxTest />
           <ReactReduxTest />
-          <ReconcileTest />
+          <ReconcileTest /> */}
         </div>
       )
     }
