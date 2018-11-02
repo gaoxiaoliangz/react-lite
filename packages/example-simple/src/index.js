@@ -3,6 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import app from './app'
 import './style.css'
+import diffRendered from './diffRendered'
 
 const mount = ({ domNode, renderFn, react, onUpdate = () => {} }) => {
   const App = app(react, {
@@ -27,5 +28,12 @@ mount({
   react: React,
   onUpdate: () => {
     console.log('update from fb react')
+    setTimeout(() => {
+      const diff = diffRendered(
+        document.getElementById('root').innerHTML,
+        document.getElementById('root2').innerHTML
+      )
+      console.log(diff.join('\n'))
+    }, 100)
   },
 })

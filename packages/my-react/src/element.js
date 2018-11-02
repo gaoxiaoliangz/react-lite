@@ -5,7 +5,7 @@ const _createElement = (type, props = {}, ...children) => {
     type,
     props: {
       // 这边的逻辑和 React 的一样
-      ..._.omit(props, ['key']),
+      ..._.omit(props, ['key', '__source', '__self']),
       ...(children.length !== 0 && {
         children: children.length === 1 ? children[0] : children,
       }),
