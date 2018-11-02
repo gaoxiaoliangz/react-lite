@@ -25,14 +25,12 @@ export default (React, { onUpdate }) => {
     render() {
       return (
         <div>
-          test
-          <span>span</span>
           <RenderPrimitiveTest />
-          {/*<SetStateTest />
-          <ReduxTest />
-          <ReactReduxTest />
-          <ReconcileTest /> */}
-          <ChildrenTest />
+          <SetStateTest />
+          {/* <ReduxTest /> */}
+          {/* <ReactReduxTest /> */}
+          {/* <ReconcileTest /> */}
+          {/* <ChildrenTest /> */}
         </div>
       )
     }

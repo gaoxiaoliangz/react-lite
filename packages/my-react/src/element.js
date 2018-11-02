@@ -31,7 +31,7 @@ const validateChildKeys = node => {
   // a simple validation (key validation to be specific)
   if (Array.isArray(node) && node.length !== 0) {
     const reactElements = node.filter(
-      n => isReactElement(n) && !n._store.validated,
+      n => checkElement(n) !== 'text' && !n._store.validated
     )
     if (reactElements.length !== 0) {
       const keys = reactElements
@@ -47,7 +47,7 @@ const validateChildKeys = node => {
       ) {
         // TODO: print component trace
         console.warn(
-          'Each child in an array or iterator should have a unique "key" prop.',
+          'Each child in an array or iterator should have a unique "key" prop.'
         )
       }
     }
@@ -63,7 +63,7 @@ export const createElement = (type, props, ...children) => {
 }
 
 export const checkElement = ele => {
-  if (typeof ele === 'object' && ele.type && ele.props) {
+  if (ele !== null && typeof ele === 'object' && ele.type && ele.props) {
     if (typeof ele.type === 'function') {
       if (ele.type._isClass) {
         return 'class'
