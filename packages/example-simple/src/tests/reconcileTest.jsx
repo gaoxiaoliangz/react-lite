@@ -9,7 +9,7 @@ export default React => {
     }
 
     componentDidMount() {
-      this.flag.setAttribute('class', 'modified')
+      this.flag.setAttribute('class', 'green')
     }
 
     updateClicks = clicks => {
@@ -23,7 +23,7 @@ export default React => {
       return (
         <Section title="reconcile test">
           <div className="reconcileTest">
-            <div ref={ref => (this.flag = ref)} />
+            <div className="red" ref={ref => (this.flag = ref)} />
             <button onClick={() => this.updateClicks(clicks - 1)}>-</button>
             {clicks}
             <button onClick={() => this.updateClicks(clicks + 1)}>+</button>

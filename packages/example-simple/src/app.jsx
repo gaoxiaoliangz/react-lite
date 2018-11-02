@@ -29,7 +29,7 @@ export default (React, { onUpdate }) => {
           <SetStateTest />
           <ReduxTest />
           {/* <ReactReduxTest /> */}
-          {/* <ReconcileTest /> */}
+          <ReconcileTest />
           <ChildrenTest />
         </div>
       )

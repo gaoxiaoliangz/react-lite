@@ -13,30 +13,35 @@ const mount = ({ domNode, renderFn, react, onUpdate = () => {} }) => {
   renderFn(react.createElement(App), domNode)
 }
 
-mount({
-  domNode: document.getElementById('root'),
-  renderFn: MyReactDOM.render,
-  react: MyReact,
-  onUpdate: () => {
-    console.log('update from my react')
-  },
-})
+const render = () => {
+  mount({
+    domNode: document.getElementById('root'),
+    renderFn: MyReactDOM.render,
+    react: MyReact,
+    onUpdate: () => {
+      console.log('update from my react')
+    },
+  })
 
-mount({
-  domNode: document.getElementById('root2'),
-  renderFn: ReactDOM.render,
-  react: React,
-  onUpdate: () => {
-    setTimeout(() => {
-      const diff = diffRendered(
-        document.getElementById('root').innerHTML,
-        document.getElementById('root2').innerHTML
-      )
-      if (diff) {
-        console.log(diff.join('\n'))
-      } else {
-        console.log('diffRendered: They are same')
-      }
-    }, 100)
-  },
-})
+  mount({
+    domNode: document.getElementById('root2'),
+    renderFn: ReactDOM.render,
+    react: React,
+    onUpdate: () => {
+      setTimeout(() => {
+        const diff = diffRendered(
+          document.getElementById('root').innerHTML,
+          document.getElementById('root2').innerHTML
+        )
+        if (diff) {
+          console.log(diff.join('\n'))
+        } else {
+          console.log('diffRendered: They are same')
+        }
+      }, 100)
+    },
+  })
+}
+
+render()
+window.__render = render

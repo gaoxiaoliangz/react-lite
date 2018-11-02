@@ -1,4 +1,11 @@
-.reconcileTest .modified {
+.reconcileTest .green {
+  background: green;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.reconcileTest .red {
   background: red;
   width: 20px;
   height: 20px;
