@@ -3,17 +3,12 @@ export default class Component {
     this.props = props
   }
 
-  setWatcher(cb) {
-    this.watcherCb = cb
+  _setNotifier(notifier) {
+    this._notifier = notifier
   }
 
   setState(state, cb) {
-    this.state = state
-    console.info('setState', state)
-    this.watcherCb()
-    if (cb) {
-      cb()
-    }
+    this._notifier(state, cb)
   }
 }
 

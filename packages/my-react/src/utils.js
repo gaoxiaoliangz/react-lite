@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { CLASS_COMPONENT_TYPE } from './react-component'
 
 export class TwoWayWeakMap {
   constructor() {
@@ -60,10 +59,6 @@ export function uuid() {
       .substring(1)
   }
   return s4() + s4()
-}
-
-export function isClassComponent(v) {
-  return typeof v === 'function' && v.type === CLASS_COMPONENT_TYPE
 }
 
 export function getAttrs(props) {

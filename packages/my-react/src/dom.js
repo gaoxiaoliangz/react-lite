@@ -7,7 +7,9 @@ export const render = (reactElement, domNode) => {
   domNode.appendChild(createDOMFromNode(createNode(reactElement)))
 }
 
-const applyPatch = ({ attributeChanged }) => {}
+export const applyPatch = ({ attributeChanged }) => {
+  console.log('patch applied')
+}
 
 const createDOMFromNode = node => {
   const {
@@ -51,3 +53,7 @@ const createDOMFromNode = node => {
 
   return dom
 }
+
+// componentDidMount 从最深的组件向上冒泡
+// 目前的方式会在最深的组件都构建完成之后才 appendChild，这样在深组件 componentDidMount
+// 里面获取父级的 dom 会获取不到

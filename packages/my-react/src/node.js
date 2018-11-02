@@ -1,5 +1,7 @@
 import { checkElement } from './element'
 import { arrayGuard, getAttrs } from './utils'
+import diff from './diff'
+import { applyPatch } from './dom'
 
 const eventMap = {
   onClick: 'click',
@@ -23,7 +25,34 @@ export const createNode = reactElement => {
     case 'class': {
       nodeType = -1
       const instance = new type(props)
-      childNodes = [createNode(instance.render())]
+      instance._setNotifier((state, cb) => {
+        setImmediate(() => {
+          // render with new state
+          const prevState = instance.state
+          const prevProps = props
+          instance.state = {
+            ...prevState,
+            ...state,
+          }
+          const newNode = createNode(instance.render())
+
+          // diff rendered node with previous node
+          const diffResult = diff(newNode, node)
+
+          // patch dom with diffs
+          applyPatch(diffResult)
+
+          // componentDidUpdate
+          if (instance.componentDidUpdate) {
+            instance.componentDidUpdate(prevProps, prevState)
+          }
+
+          // everything is done, lets callback
+          if (cb) cb()
+        })
+      })
+      const node = createNode(instance.render())
+      childNodes = [node]
       break
     }
 
