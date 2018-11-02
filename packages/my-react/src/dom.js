@@ -7,8 +7,8 @@ export const render = (reactElement, domNode) => {
   domNode.appendChild(createDOMFromNode(createNode(reactElement)))
 }
 
-export const applyPatch = ({ attributeChanged }) => {
-  console.log('patch applied')
+export const applyPatch = patches => {
+  console.log(patches)
 }
 
 const createDOMFromNode = node => {
