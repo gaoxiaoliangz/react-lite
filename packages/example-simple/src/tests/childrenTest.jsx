@@ -35,7 +35,6 @@ export default React => {
         )}
       </Section>
     )
-    console.log(content)
     return content
   }
   return ChildrenTest

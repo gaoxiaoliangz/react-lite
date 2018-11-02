@@ -27,13 +27,16 @@ mount({
   renderFn: ReactDOM.render,
   react: React,
   onUpdate: () => {
-    console.log('update from fb react')
     setTimeout(() => {
       const diff = diffRendered(
         document.getElementById('root').innerHTML,
         document.getElementById('root2').innerHTML
       )
-      console.log(diff.join('\n'))
+      if (diff) {
+        console.log(diff.join('\n'))
+      } else {
+        console.log('diffRendered: They are same')
+      }
     }, 100)
   },
 })

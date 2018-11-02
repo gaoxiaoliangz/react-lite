@@ -52,7 +52,8 @@ export const createNode = reactElement => {
 
     case 'text': {
       nodeType = 3
-      textContent = reactElement
+      const empty = [true, false, null]
+      textContent = empty.includes(reactElement) ? '' : reactElement
       break
     }
 
