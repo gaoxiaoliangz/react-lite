@@ -1,4 +1,5 @@
 import MyReact, { ReactDOM as MyReactDOM } from 'my-react'
+// import React3, { render as render3 } from 'inferno-compat'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import app from './app'
@@ -22,6 +23,15 @@ const render = () => {
       console.log('update from my react')
     },
   })
+
+  // mount({
+  //   domNode: document.getElementById('root2'),
+  //   renderFn: render3,
+  //   react: React3,
+  //   onUpdate: () => {
+  //     console.log('update from inferno')
+  //   },
+  // })
 
   mount({
     domNode: document.getElementById('root2'),

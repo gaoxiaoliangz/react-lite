@@ -5,6 +5,7 @@ import reduxTest from './tests/reduxTest'
 import reconcileTest from './tests/reconcileTest'
 import childrenTest from './tests/childrenTest'
 import lifecycleTest from './tests/lifecycleTest'
+import reconcileTest2 from './tests/reconcileTest2'
 
 export default (React, { onUpdate }) => {
   const RenderPrimitiveTest = renderPrimitiveTest(React)
@@ -14,6 +15,7 @@ export default (React, { onUpdate }) => {
   const ReconcileTest = reconcileTest(React)
   const ChildrenTest = childrenTest(React)
   const LifecycleTest = lifecycleTest(React)
+  const ReconcileTest2 = reconcileTest2(React)
 
   class App extends React.Component {
     componentDidMount() {
@@ -34,6 +36,7 @@ export default (React, { onUpdate }) => {
           <ReconcileTest />
           <ChildrenTest />
           <LifecycleTest />
+          <ReconcileTest2 />
         </div>
       )
     }
