@@ -8,23 +8,23 @@ const eventMap = {
   onMouseDown: 'mousedown',
 }
 
-const processChildren = (children, prefix = '') => {
+const processChildren = (children, prefix = '__root_') => {
   let output = []
   const childrenArr = arrayGuard(children)
 
   childrenArr.forEach((childElement, idx) => {
     if (Array.isArray(childElement)) {
-      output = output.concat(processChildren(childElement, prefix + '$'))
+      output = output.concat(processChildren(childElement, prefix + '>'))
     } else {
       if (checkElement(childElement) !== 'text') {
         if (childElement.key === undefined) {
           const cloned = cloneElement(childElement, {
-            key: '_' + prefix + idx,
+            key: prefix + idx,
           })
           output.push(cloned)
         } else {
           const cloned = cloneElement(childElement, {
-            key: prefix + childElement.key,
+            key: '__gen_' + prefix + childElement.key,
           })
           output.push(cloned)
         }
@@ -93,6 +93,15 @@ export const createNode = reactElement => {
     case 'dom': {
       nodeType = 1
       const processedChildren = processChildren(props.children)
+
+      // validate keys
+      const keys = processedChildren
+        .filter(child => checkElement(child) !== 'text')
+        .map(child => child.key)
+      if (keys.length !== _.union(keys).length) {
+        console.log('key should be unique!')
+      }
+
       childNodes = processedChildren.map(childElement => {
         return createNode(childElement)
       })
