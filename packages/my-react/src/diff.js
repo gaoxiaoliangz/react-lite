@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { checkElement } from './element'
 
 // @ts-check
 /**
@@ -53,6 +54,32 @@ const diff = (node, prevNode, results = []) => {
   }
 
   return results
+}
+
+const diffChildren = (currentChildren, lastChildren) => {
+  const visitedLastChildrenIdx = []
+  const results = []
+  currentChildren.forEach((currentNode, idx) => {
+    const { nodeType } = currentNode
+
+    switch (nodeType) {
+      case -1:
+      case 1: {
+        if (currentNode.key === lastChildren[idx]) {
+          results.push(diff(currentNode, lastChildren[idx]))
+        } else {
+          
+        }
+
+        break
+      }
+      case 3: {
+        break
+      }
+      default:
+        break
+    }
+  })
 }
 
 export default diff
