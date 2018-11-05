@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@gxl/react-scripts": "2.2.5",
+    "inferno": "^6.1.4",
+    "inferno-compat": "^6.1.4",
     "lodash": "^4.17.4",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",

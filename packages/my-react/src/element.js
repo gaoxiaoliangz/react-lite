@@ -62,6 +62,27 @@ export const createElement = (type, props, ...children) => {
   return reactElement
 }
 
+export const cloneElement = (element, props, ...children) => {
+  const cloned = _createElement(
+    element.type,
+    {
+      ...element.props,
+      ...props,
+    },
+    ...(children.length > 0
+      ? children
+      : Array.isArray(element.props.children)
+        ? element.props.children
+        : [element.props.children])
+  )
+  Object.keys(element._store)
+    .concat('validated')
+    .forEach(key => {
+      cloned._store[key] = element._store[key]
+    })
+  return cloned
+}
+
 export const checkElement = ele => {
   if (ele !== null && typeof ele === 'object' && ele.type && ele.props) {
     if (typeof ele.type === 'function') {

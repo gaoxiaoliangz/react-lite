@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { checkElement } from './element'
 
 // @ts-check
 /**
@@ -24,7 +25,7 @@ const diff = (node, prevNode, results = []) => {
     }
 
     case 1: {
-      const patches = []
+      let patches = []
       if (!_.isEqual(node.attributes, prevNode.attributes)) {
         patches.push({
           attributeChanged: {
@@ -32,7 +33,7 @@ const diff = (node, prevNode, results = []) => {
           },
         })
       }
-      // @todo: diff childNodes
+      patches = patches.concat(diffChildren(node.childNodes, prevNode.childNodes))
       return results.concat(patches)
     }
 
@@ -53,6 +54,40 @@ const diff = (node, prevNode, results = []) => {
   }
 
   return results
+}
+
+const diffChildren = (currentChildren, lastChildren) => {
+  const visitedLastChildrenIdx = []
+  const results = []
+  currentChildren.forEach((currentNode, idx) => {
+    const { nodeType, key } = currentNode
+
+    switch (nodeType) {
+      case -1:
+      case 1: {
+        if (key === lastChildren[idx]) {
+          results.push(diff(currentNode, lastChildren[idx]))
+          visitedLastChildrenIdx.push(idx)
+        } else {
+          const match = lastChildren.find(child => child.key === key)
+          if (match) {
+            visitedLastChildrenIdx.push(lastChildren.indexOf(match))
+            results.push(diff(currentNode, match))
+          } else {
+            results.push({
+              added: currentNode,
+            })
+          }
+        }
+        break
+      }
+      case 3: {
+        break
+      }
+      default:
+        break
+    }
+  })
 }
 
 export default diff
