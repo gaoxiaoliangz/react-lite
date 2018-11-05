@@ -4,34 +4,57 @@ import childrenTest from './tests/childrenTest'
 import reconcileTest from './tests/reconcileTest'
 import reduxTest from './tests/reduxTest'
 import lifecycleTest from './tests/lifecycleTest'
-import reconcileTest2 from './tests/reconcileTest2'
+import reconcileTest2 from './tests/diffTests/unkeyedTest'
 import reactReduxTest from './tests/reactReduxTest'
+import keyedTest from './tests/diffTests/keyedTest'
+import manuallyKeyedTest from './tests/diffTests/manuallyKeyedTest'
+import reorderTextNodes from './tests/diffTests/reorderTextNodes'
+import unkeyedTest from './tests/diffTests/unkeyedTest'
+import reorderTextNodes2 from './tests/diffTests/reorderTextNodes2'
 
 export default (React, { onUpdate }) => {
   const tests = [
     {
+      test: keyedTest,
+    },
+    {
+      test: manuallyKeyedTest,
+    },
+    {
+      test: unkeyedTest,
+    },
+    {
+      test: reorderTextNodes,
+    },
+    {
+      test: reorderTextNodes2,
+    },
+    {
       test: renderPrimitiveTest,
+      disabled: true,
     },
     {
       test: setStateTest,
+      disabled: true,
     },
     {
       test: childrenTest,
     },
     {
       test: reconcileTest,
+      disabled: true,
     },
     {
       test: reduxTest,
+      disabled: true,
     },
     {
       test: lifecycleTest,
+      disabled: true,
     },
     {
       test: reconcileTest2,
-    },
-    {
-      test: renderPrimitiveTest,
+      disabled: true,
     },
     {
       test: reactReduxTest,

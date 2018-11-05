@@ -1,6 +1,5 @@
 import _ from 'lodash'
-import section from '../section'
-import './reconcileTest.css'
+import section from '../../section'
 
 export default React => {
   const Section = section(React)
@@ -21,30 +20,8 @@ export default React => {
 
     render() {
       const { showFirst } = this.state
-      const stuff = (
-        <div>
-          {showFirst ? (
-            <div>
-              <div>
-                <div>0</div>
-              </div>
-            </div>
-          ) : null}
-          <div>
-            <div>
-              <div>1</div>
-            </div>
-          </div>
-          <div>
-            <div>
-              <div>2</div>
-            </div>
-          </div>
-        </div>
-      )
-      console.log(stuff)
       return (
-        <Section title="reconcile test">
+        <Section title="manually keyed test">
           <div>
             <button
               onClick={() => {
@@ -56,32 +33,6 @@ export default React => {
               toggle first
             </button>
           </div>
-          {showFirst ? (
-            <div>
-              <div>0</div>
-              <div>1</div>
-              <div>2</div>
-            </div>
-          ) : (
-            <div>
-              <div>1</div>
-              <div>2</div>
-            </div>
-          )}
-          <hr />
-          {showFirst ? (
-            <div>
-              <div>0</div>
-              <div>1</div>
-              <div>2</div>
-            </div>
-          ) : (
-            <div>
-              <div>1</div>
-              <div>2</div>
-            </div>
-          )}
-          {stuff}
           <ul>
             {_.times(3, n => {
               if (n === 0 && !showFirst) {

@@ -4,8 +4,8 @@ import './reconcileTest.css'
 
 export default React => {
   const Section = section(React)
-  const ItemA = () => <div>itemA</div>
-  const ItemB = () => <div>itemB</div>
+  // const ItemA = () => <div>itemA</div>
+  // const ItemB = () => <div>itemB</div>
 
   class ReconcileTest extends React.Component {
     state = {
