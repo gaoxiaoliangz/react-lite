@@ -133,6 +133,7 @@ export const createNode = reactElement => {
     attributes,
     childNodes,
     listeners,
+    key,
     _store,
   }
 }
