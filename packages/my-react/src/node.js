@@ -3,21 +3,31 @@ import _ from 'lodash'
 import { checkElement } from './element'
 import { arrayGuard, getAttrs } from './utils'
 import diff from './diff'
-import { applyPatch } from './dom'
+import { applyPatches } from './dom'
 
 const eventMap = {
   onClick: 'click',
   onMouseDown: 'mousedown',
 }
 
-const processChildren = (children, createNode, prefix = '__root_') => {
+const processChildren = (
+  children,
+  createNode,
+  prefix = '__root_',
+  parentNode,
+) => {
   let output = []
   const childrenArr = arrayGuard(children)
 
   childrenArr.forEach((childElement, idx) => {
     if (Array.isArray(childElement)) {
       output = output.concat(
-        processChildren(childElement, createNode, `${prefix}${idx}_>`),
+        processChildren(
+          childElement,
+          createNode,
+          `${prefix}${idx}_>`,
+          parentNode,
+        ),
       )
     } else {
       let key
@@ -29,13 +39,13 @@ const processChildren = (children, createNode, prefix = '__root_') => {
       } else {
         key = '__gen_' + prefix + idx
       }
-      output.push(createNode(childElement, key))
+      output.push(createNode(childElement, key, parentNode))
     }
   })
   return output
 }
 
-export const createNode = (reactElement, key) => {
+export const createNode = (reactElement, key, parentNode) => {
   const eleType = checkElement(reactElement)
   // @ts-ignore
   const { type, props, key: _key, ...rest } = reactElement || {}
@@ -49,6 +59,9 @@ export const createNode = (reactElement, key) => {
   let textContent
   let childNodes = []
   let finalKey = key || _key
+  const node = {
+    parentNode,
+  }
 
   switch (eleType) {
     case 'class': {
@@ -65,13 +78,15 @@ export const createNode = (reactElement, key) => {
             ...prevState,
             ...state,
           }
-          const newNode = createNode(instance.render())
+          const newInnerNode = createNode(instance.render(), null, node)
 
           // diff rendered node with previous node
-          const diffResult = diff(newNode, node)
+          const diffResult = diff(newInnerNode, innerNode)
 
           // patch dom with diffs
-          applyPatch(diffResult)
+          applyPatches(diffResult)
+          // @todo
+          // clean up old nodes
 
           // componentDidUpdate
           if (instance.componentDidUpdate) {
@@ -82,20 +97,25 @@ export const createNode = (reactElement, key) => {
           if (cb) cb()
         })
       })
-      const node = createNode(instance.render())
-      childNodes = [node]
+      const innerNode = createNode(instance.render(), null, node)
+      childNodes = [innerNode]
       break
     }
 
     case 'func': {
       nodeType = -1
-      childNodes = [createNode(type(props))]
+      childNodes = [createNode(type(props), null, node)]
       break
     }
 
     case 'dom': {
       nodeType = 1
-      const processedChildren = processChildren(props.children, createNode)
+      const processedChildren = processChildren(
+        props.children,
+        createNode,
+        undefined,
+        node,
+      )
       childNodes = processedChildren
 
       // validate keys
@@ -130,7 +150,7 @@ export const createNode = (reactElement, key) => {
       throw new Error(`Unknown eleType ${eleType}!`)
   }
 
-  return {
+  return Object.assign(node, {
     ...rest,
     nodeType,
     tagName,
@@ -140,5 +160,5 @@ export const createNode = (reactElement, key) => {
     listeners,
     key: finalKey,
     _store,
-  }
+  })
 }

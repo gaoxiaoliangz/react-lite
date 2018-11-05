@@ -21,7 +21,8 @@ const diff = (node, prevNode, results = []) => {
       },
       {
         type: 'added',
-        payload: node,
+        payload: { node, parentNode: prevNode.parentNode },
+        nextSiblingNode: null,
       },
     ])
   }
@@ -41,7 +42,7 @@ const diff = (node, prevNode, results = []) => {
         })
       }
       patches = patches.concat(
-        diffChildren(node.childNodes, prevNode.childNodes),
+        diffChildren(node.childNodes, prevNode.childNodes, prevNode.parentNode),
       )
       return results.concat(patches)
     }
@@ -64,7 +65,7 @@ const diff = (node, prevNode, results = []) => {
   return results
 }
 
-const diffChildren = (currentChildren, lastChildren) => {
+const diffChildren = (currentChildren, lastChildren, parentNode) => {
   const lastNodeInUse = []
   let results = []
   currentChildren.forEach((currentNode, idx) => {
@@ -73,6 +74,7 @@ const diffChildren = (currentChildren, lastChildren) => {
       results = results.concat(diff(currentNode, lastChildren[idx]))
       lastNodeInUse.push(idx)
     } else {
+      // @todo: reordered
       const match = lastChildren.find(child => child.key === key)
       if (match) {
         lastNodeInUse.push(lastChildren.indexOf(match))
@@ -80,7 +82,11 @@ const diffChildren = (currentChildren, lastChildren) => {
       } else {
         results.push({
           type: 'added',
-          payload: currentNode,
+          payload: {
+            node: currentNode,
+            parentNode,
+            previousSiblingNode: lastChildren[idx - 1],
+          },
         })
       }
     }

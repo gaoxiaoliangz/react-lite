@@ -3,13 +3,53 @@ import _ from 'lodash'
 import { createNode } from './node'
 import { TwoWayWeakMap, updateAttrs, getNodeIndex, removeNode } from './utils'
 import { checkElement } from './element'
+// node -> DOM
+import { nodeDOMMap } from './store'
 
 export const render = (reactElement, domNode) => {
   domNode.appendChild(createDOMFromNode(createNode(reactElement)))
 }
 
-export const applyPatch = patches => {
+export const applyPatches = patches => {
   console.log(patches)
+  patches.forEach(applyPatch)
+}
+
+const applyPatch = patch => {
+  const { type, payload } = patch
+  switch (type) {
+    case 'added': {
+      const { node, parentNode, previousSiblingNode } = payload
+      const dom = createDOMFromNode(node)
+      const parentDOM = nodeDOMMap.get(parentNode)
+      const siblingDOM = previousSiblingNode
+        ? nodeDOMMap.get(previousSiblingNode).nextSibling
+        : parentDOM.childNodes[0]
+      parentDOM.insertBefore(dom, siblingDOM)
+      break
+    }
+    case 'textChanged': {
+      console.log('todo')
+      break
+    }
+    case 'attributeChanged': {
+      console.log('todo')
+      break
+    }
+    case 'removed': {
+      const dom = nodeDOMMap.get(payload)
+      dom.parentNode.removeChild(dom)
+      // @todo call lifecycle
+      break
+    }
+    case 'reordered': {
+      console.log('todo')
+      break
+    }
+    default:
+      console.error(`Unknown type: ${type}`)
+      break
+  }
 }
 
 const createDOMFromNode = node => {
@@ -61,6 +101,7 @@ const createDOMFromNode = node => {
       }
     })
   }
+  nodeDOMMap.set(node, dom)
 
   return dom
 }
