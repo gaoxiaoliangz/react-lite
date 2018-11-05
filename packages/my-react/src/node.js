@@ -1,4 +1,4 @@
-import { checkElement } from './element'
+import { checkElement, cloneElement } from './element'
 import { arrayGuard, getAttrs } from './utils'
 import diff from './diff'
 import { applyPatch } from './dom'
@@ -6,6 +6,34 @@ import { applyPatch } from './dom'
 const eventMap = {
   onClick: 'click',
   onMouseDown: 'mousedown',
+}
+
+const processChildren = (children, prefix = '') => {
+  let output = []
+  const childrenArr = arrayGuard(children)
+
+  childrenArr.forEach((childElement, idx) => {
+    if (Array.isArray(childElement)) {
+      output = output.concat(processChildren(childElement, prefix + '$'))
+    } else {
+      if (checkElement(childElement) !== 'text') {
+        if (childElement.key === undefined) {
+          const cloned = cloneElement(childElement, {
+            key: '_' + prefix + idx,
+          })
+          output.push(cloned)
+        } else {
+          const cloned = cloneElement(childElement, {
+            key: prefix + childElement.key,
+          })
+          output.push(cloned)
+        }
+      } else {
+        output.push(childElement)
+      }
+    }
+  })
+  return output
 }
 
 export const createNode = reactElement => {
@@ -64,11 +92,10 @@ export const createNode = reactElement => {
 
     case 'dom': {
       nodeType = 1
-      childNodes = _.flattenDeep(arrayGuard(props.children)).map(
-        childElement => {
-          return createNode(childElement)
-        }
-      )
+      const processedChildren = processChildren(props.children)
+      childNodes = processedChildren.map(childElement => {
+        return createNode(childElement)
+      })
       tagName = type
       attributes = getAttrs(props)
       const eventProps = _.pick(props, _.keys(eventMap))

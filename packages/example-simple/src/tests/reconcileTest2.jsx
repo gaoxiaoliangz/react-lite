@@ -89,6 +89,7 @@ export default React => {
               }
               return (
                 <li
+                  key={n}
                   ref={ref => {
                     if (n === 1) {
                       this.item = ref
