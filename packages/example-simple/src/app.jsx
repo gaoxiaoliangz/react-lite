@@ -1,21 +1,43 @@
 import renderPrimitiveTest from './tests/renderPrimitiveTest'
 import setStateTest from './tests/setStateTest'
-import reactReduxTest from './tests/reactReduxTest'
-import reduxTest from './tests/reduxTest'
-import reconcileTest from './tests/reconcileTest'
 import childrenTest from './tests/childrenTest'
+import reconcileTest from './tests/reconcileTest'
+import reduxTest from './tests/reduxTest'
 import lifecycleTest from './tests/lifecycleTest'
 import reconcileTest2 from './tests/reconcileTest2'
+import reactReduxTest from './tests/reactReduxTest'
 
 export default (React, { onUpdate }) => {
-  const RenderPrimitiveTest = renderPrimitiveTest(React)
-  const SetStateTest = setStateTest(React)
-  const ReduxTest = reduxTest(React)
-  const ReactReduxTest = reactReduxTest(React)
-  const ReconcileTest = reconcileTest(React)
-  const ChildrenTest = childrenTest(React)
-  const LifecycleTest = lifecycleTest(React)
-  const ReconcileTest2 = reconcileTest2(React)
+  const tests = [
+    {
+      test: renderPrimitiveTest,
+    },
+    {
+      test: setStateTest,
+    },
+    {
+      test: childrenTest,
+    },
+    {
+      test: reconcileTest,
+    },
+    {
+      test: reduxTest,
+    },
+    {
+      test: lifecycleTest,
+    },
+    {
+      test: reconcileTest2,
+    },
+    {
+      test: renderPrimitiveTest,
+    },
+    {
+      test: reactReduxTest,
+      disabled: true,
+    },
+  ]
 
   class App extends React.Component {
     componentDidMount() {
@@ -29,14 +51,13 @@ export default (React, { onUpdate }) => {
     render() {
       return (
         <div>
-          <RenderPrimitiveTest />
-          <SetStateTest />
-          <ReduxTest />
-          {/* <ReactReduxTest /> */}
-          <ReconcileTest />
-          <ChildrenTest />
-          <LifecycleTest />
-          <ReconcileTest2 />
+          {tests.map((test, idx) => {
+            if (test.disabled) {
+              return null
+            }
+            const TestComp = test.test(React)
+            return <TestComp key={idx} />
+          })}
         </div>
       )
     }
