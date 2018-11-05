@@ -2,6 +2,7 @@
 import _ from 'lodash'
 import { createNode } from './node'
 import { TwoWayWeakMap, updateAttrs, getNodeIndex, removeNode } from './utils'
+import { checkElement } from './element'
 
 export const render = (reactElement, domNode) => {
   domNode.appendChild(createDOMFromNode(createNode(reactElement)))
@@ -19,6 +20,7 @@ const createDOMFromNode = node => {
     tagName,
     textContent,
     childNodes,
+    ref,
   } = node
   let dom
   switch (nodeType) {
@@ -30,6 +32,9 @@ const createDOMFromNode = node => {
 
     case 1: {
       dom = document.createElement(tagName)
+      if (ref) {
+        ref(dom)
+      }
       updateAttrs(dom, attributes)
       _.forEach(listeners, (handler, key) => {
         dom.addEventListener(key, handler)
@@ -46,8 +51,14 @@ const createDOMFromNode = node => {
       throw new Error(`Unknown nodeType ${nodeType}!`)
   }
   if (nodeType !== -1) {
-    childNodes.forEach(child => {
-      dom.appendChild(createDOMFromNode(child))
+    childNodes.forEach(childNode => {
+      dom.appendChild(createDOMFromNode(childNode))
+      const { element, instance } = childNode._store
+      if (checkElement(element) === 'class') {
+        if (instance.componentDidMount) {
+          instance.componentDidMount()
+        }
+      }
     })
   }
 

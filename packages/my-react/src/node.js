@@ -38,7 +38,7 @@ const processChildren = (children, createNode, prefix = '__root_') => {
 export const createNode = (reactElement, key) => {
   const eleType = checkElement(reactElement)
   // @ts-ignore
-  const { type, props, key: _key } = reactElement || {}
+  const { type, props, key: _key, ...rest } = reactElement || {}
   const _store = {
     element: reactElement,
   }
@@ -54,6 +54,7 @@ export const createNode = (reactElement, key) => {
     case 'class': {
       nodeType = -1
       const instance = new type(props)
+      _store.instance = instance
       instance._setNotifier((state, cb) => {
         // @ts-ignore
         setImmediate(() => {
@@ -107,7 +108,7 @@ export const createNode = (reactElement, key) => {
         print(uniqueKeys)
         print(keys)
       }
-      
+
       tagName = type
       attributes = getAttrs(props)
       const eventProps = _.pick(props, _.keys(eventMap))
@@ -130,6 +131,7 @@ export const createNode = (reactElement, key) => {
   }
 
   return {
+    ...rest,
     nodeType,
     tagName,
     textContent,

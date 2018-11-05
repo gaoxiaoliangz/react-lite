@@ -65,7 +65,6 @@ const diff = (node, prevNode, results = []) => {
 }
 
 const diffChildren = (currentChildren, lastChildren) => {
-  console.log(currentChildren, lastChildren)
   const lastNodeInUse = []
   let results = []
   currentChildren.forEach((currentNode, idx) => {
