@@ -1,11 +1,12 @@
+// @ts-check
 import _ from 'lodash'
 import { checkElement } from './element'
 
-// @ts-check
 /**
  * #diff
  * @param {*} node
  * @param {*} prevNode
+ * @returns {{type: 'added' | 'textChanged' | 'attributeChanged' | 'removed' | 'reordered', payload: any}[]}
  */
 //  * @returns {{attributeChanged, removed, added, textChanged, reordered}}
 const diff = (node, prevNode, results = []) => {
@@ -13,14 +14,21 @@ const diff = (node, prevNode, results = []) => {
     node.nodeType !== prevNode.nodeType ||
     (node.tagName && node.tagName !== prevNode.tagName)
   ) {
-    return results.concat({
-      removed: [prevNode],
-      added: [node],
-    })
+    return results.concat([
+      {
+        type: 'removed',
+        payload: prevNode,
+      },
+      {
+        type: 'added',
+        payload: node,
+      },
+    ])
   }
 
   switch (node.nodeType) {
     case -1: {
+      // @todo
       return diff(node.childNodes[0], prevNode.childNodes[0], results)
     }
 
@@ -28,21 +36,21 @@ const diff = (node, prevNode, results = []) => {
       let patches = []
       if (!_.isEqual(node.attributes, prevNode.attributes)) {
         patches.push({
-          attributeChanged: {
-            node,
-          },
+          type: 'attributeChanged',
+          payload: node,
         })
       }
-      patches = patches.concat(diffChildren(node.childNodes, prevNode.childNodes))
+      patches = patches.concat(
+        diffChildren(node.childNodes, prevNode.childNodes),
+      )
       return results.concat(patches)
     }
 
     case 3: {
       if (node.textContent !== prevNode.textContent) {
         return results.concat({
-          textChanged: {
-            node,
-          },
+          type: 'textChanged',
+          payload: node,
         })
       }
       return results
@@ -57,37 +65,37 @@ const diff = (node, prevNode, results = []) => {
 }
 
 const diffChildren = (currentChildren, lastChildren) => {
-  const visitedLastChildrenIdx = []
-  const results = []
+  console.log(currentChildren, lastChildren)
+  const lastNodeInUse = []
+  let results = []
   currentChildren.forEach((currentNode, idx) => {
-    const { nodeType, key } = currentNode
-
-    switch (nodeType) {
-      case -1:
-      case 1: {
-        if (key === lastChildren[idx]) {
-          results.push(diff(currentNode, lastChildren[idx]))
-          visitedLastChildrenIdx.push(idx)
-        } else {
-          const match = lastChildren.find(child => child.key === key)
-          if (match) {
-            visitedLastChildrenIdx.push(lastChildren.indexOf(match))
-            results.push(diff(currentNode, match))
-          } else {
-            results.push({
-              added: currentNode,
-            })
-          }
-        }
-        break
+    const { key } = currentNode
+    if (lastChildren[idx] && key === lastChildren[idx].key) {
+      results = results.concat(diff(currentNode, lastChildren[idx]))
+      lastNodeInUse.push(idx)
+    } else {
+      const match = lastChildren.find(child => child.key === key)
+      if (match) {
+        lastNodeInUse.push(lastChildren.indexOf(match))
+        results = results.concat(diff(currentNode, match))
+      } else {
+        results.push({
+          type: 'added',
+          payload: currentNode,
+        })
       }
-      case 3: {
-        break
-      }
-      default:
-        break
     }
   })
+  const removed = lastChildren
+    .filter((child, idx) => !lastNodeInUse.includes(idx))
+    .map(child => ({
+      type: 'removed',
+      payload: child,
+    }))
+  if (removed.length) {
+    results = results.concat(removed)
+  }
+  return results
 }
 
 export default diff

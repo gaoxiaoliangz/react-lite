@@ -5,12 +5,13 @@ const _createElement = (type, props = {}, ...children) => {
     type,
     props: {
       // 这边的逻辑和 React 的一样
-      ..._.omit(props, ['key', '__source', '__self']),
+      ..._.omit(props, ['key', 'ref', '__source', '__self']),
       ...(children.length !== 0 && {
         children: children.length === 1 ? children[0] : children,
       }),
     },
-    key: _.get(props, 'key'),
+    key: props.key,
+    ref: props.ref,
   }
   element._store = {}
 
@@ -31,7 +32,7 @@ const validateChildKeys = node => {
   // a simple validation (key validation to be specific)
   if (Array.isArray(node) && node.length !== 0) {
     const reactElements = node.filter(
-      n => checkElement(n) !== 'text' && !n._store.validated
+      n => checkElement(n) !== 'text' && !n._store.validated,
     )
     if (reactElements.length !== 0) {
       const keys = reactElements
@@ -47,7 +48,7 @@ const validateChildKeys = node => {
       ) {
         // TODO: print component trace
         console.warn(
-          'Each child in an array or iterator should have a unique "key" prop.'
+          'Each child in an array or iterator should have a unique "key" prop.',
         )
       }
     }
@@ -73,7 +74,7 @@ export const cloneElement = (element, props, ...children) => {
       ? children
       : Array.isArray(element.props.children)
         ? element.props.children
-        : [element.props.children])
+        : [element.props.children]),
   )
   Object.keys(element._store)
     .concat('validated')

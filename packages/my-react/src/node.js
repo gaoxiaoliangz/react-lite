@@ -1,4 +1,6 @@
-import { checkElement, cloneElement } from './element'
+// @ts-check
+import _ from 'lodash'
+import { checkElement } from './element'
 import { arrayGuard, getAttrs } from './utils'
 import diff from './diff'
 import { applyPatch } from './dom'
@@ -8,37 +10,35 @@ const eventMap = {
   onMouseDown: 'mousedown',
 }
 
-const processChildren = (children, prefix = '__root_') => {
+const processChildren = (children, createNode, prefix = '__root_') => {
   let output = []
   const childrenArr = arrayGuard(children)
 
   childrenArr.forEach((childElement, idx) => {
     if (Array.isArray(childElement)) {
-      output = output.concat(processChildren(childElement, prefix + '>'))
+      output = output.concat(
+        processChildren(childElement, createNode, `${prefix}${idx}_>`),
+      )
     } else {
-      if (checkElement(childElement) !== 'text') {
-        if (childElement.key === undefined) {
-          const cloned = cloneElement(childElement, {
-            key: prefix + idx,
-          })
-          output.push(cloned)
-        } else {
-          const cloned = cloneElement(childElement, {
-            key: '__gen_' + prefix + childElement.key,
-          })
-          output.push(cloned)
-        }
+      let key
+      if (
+        checkElement(childElement) !== 'text' &&
+        childElement.key !== undefined
+      ) {
+        key = prefix + childElement.key
       } else {
-        output.push(childElement)
+        key = '__gen_' + prefix + idx
       }
+      output.push(createNode(childElement, key))
     }
   })
   return output
 }
 
-export const createNode = reactElement => {
+export const createNode = (reactElement, key) => {
   const eleType = checkElement(reactElement)
-  const { type, props, key } = reactElement || {}
+  // @ts-ignore
+  const { type, props, key: _key } = reactElement || {}
   const _store = {
     element: reactElement,
   }
@@ -48,12 +48,14 @@ export const createNode = reactElement => {
   let listeners
   let textContent
   let childNodes = []
+  let finalKey = key || _key
 
   switch (eleType) {
     case 'class': {
       nodeType = -1
       const instance = new type(props)
       instance._setNotifier((state, cb) => {
+        // @ts-ignore
         setImmediate(() => {
           // render with new state
           const prevState = instance.state
@@ -92,19 +94,20 @@ export const createNode = reactElement => {
 
     case 'dom': {
       nodeType = 1
-      const processedChildren = processChildren(props.children)
+      const processedChildren = processChildren(props.children, createNode)
+      childNodes = processedChildren
 
       // validate keys
-      const keys = processedChildren
-        .filter(child => checkElement(child) !== 'text')
-        .map(child => child.key)
-      if (keys.length !== _.union(keys).length) {
+      const keys = processedChildren.map(child => child.key)
+      const uniqueKeys = _.union(keys)
+      const print = arr => console.log(arr.sort().join(', '))
+      // print(uniqueKeys)
+      if (keys.length !== uniqueKeys.length) {
         console.log('key should be unique!')
+        print(uniqueKeys)
+        print(keys)
       }
-
-      childNodes = processedChildren.map(childElement => {
-        return createNode(childElement)
-      })
+      
       tagName = type
       attributes = getAttrs(props)
       const eventProps = _.pick(props, _.keys(eventMap))
@@ -117,8 +120,8 @@ export const createNode = reactElement => {
 
     case 'text': {
       nodeType = 3
-      const empty = [true, false, null]
-      textContent = empty.includes(reactElement) ? '' : reactElement
+      const type = typeof reactElement
+      textContent = type === 'number' || type === 'string' ? reactElement : ''
       break
     }
 
@@ -133,7 +136,7 @@ export const createNode = reactElement => {
     attributes,
     childNodes,
     listeners,
-    key,
+    key: finalKey,
     _store,
   }
 }
