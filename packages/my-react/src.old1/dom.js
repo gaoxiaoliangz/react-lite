@@ -1,5 +1,6 @@
 // @ts-check
 import _ from 'lodash'
+import invariant from 'invariant'
 import { createNode } from './node'
 import { TwoWayWeakMap, updateAttrs, getNodeIndex, removeNode } from './utils'
 import { checkElement } from './element'
@@ -7,7 +8,7 @@ import { checkElement } from './element'
 import { nodeDOMMap } from './store'
 
 export const render = (reactElement, domNode) => {
-  domNode.appendChild(createDOMFromNode(createNode(reactElement)))
+  createDOMFromNode(createNode(reactElement), domNode)
 }
 
 export const applyPatches = patches => {
@@ -26,6 +27,8 @@ const applyPatch = patch => {
         ? nodeDOMMap.get(previousSiblingNode).nextSibling
         : parentDOM.childNodes[0]
       parentDOM.insertBefore(dom, siblingDOM)
+      node.dom = dom
+      node.mounted = true
       break
     }
     case 'textChanged': {
@@ -52,7 +55,51 @@ const applyPatch = patch => {
   }
 }
 
-const createDOMFromNode = node => {
+export const updateDOMListeners = (dom, listeners, prevListeners) => {
+  if (prevListeners) {
+    _.forEach(prevListeners, (handler, key) => {
+      dom.removeEventListener(key, handler)
+    })
+  }
+  _.forEach(listeners, (handler, key) => {
+    dom.addEventListener(key, handler)
+  })
+}
+
+export const addListeners = (dom, listeners) => {
+  _.forEach(listeners, (handler, key) => {
+    dom.addEventListener(key, handler)
+  })
+}
+
+export const removeListeners = (dom, listeners) => {
+  _.forEach(listeners, (handler, key) => {
+    dom.removeEventListener(key, handler)
+  })
+}
+
+export const removeNodeListeners = node => {
+  if (node.nodeType === 1 || node.childNodes.length) {
+    if (node.listeners) {
+      const dom = nodeDOMMap.get(node)
+      removeListeners(dom, node.listeners)
+    }
+    node.childNodes.forEach(removeNodeListeners)
+  }
+}
+
+export const addNodeListeners = node => {
+  if (node.nodeType === 1 || node.childNodes.length) {
+    if (node.listeners) {
+      console.log(node)
+      invariant(node.mounted, `${node} has not been mounted yet`)
+      addListeners(node.dom, node.listeners)
+    }
+    node.childNodes.forEach(addNodeListeners)
+  }
+}
+
+const createDOMFromNode = (node, parentDOM) => {
   const {
     nodeType,
     attributes,
@@ -76,9 +123,10 @@ const createDOMFromNode = node => {
         ref(dom)
       }
       updateAttrs(dom, attributes)
-      _.forEach(listeners, (handler, key) => {
-        dom.addEventListener(key, handler)
-      })
+      // _.forEach(listeners, (handler, key) => {
+      //   dom.addEventListener(key, handler)
+      // })
+      updateDOMListeners(dom, listeners)
       break
     }
 
@@ -92,7 +140,10 @@ const createDOMFromNode = node => {
   }
   if (nodeType !== -1) {
     childNodes.forEach(childNode => {
-      dom.appendChild(createDOMFromNode(childNode))
+      const childDOM = createDOMFromNode(childNode)
+      dom.appendChild(childDOM)
+      childNode.mounted = true
+      childNode.dom = childDOM
       const { element, instance } = childNode._store
       if (checkElement(element) === 'class') {
         if (instance.componentDidMount) {
@@ -102,10 +153,11 @@ const createDOMFromNode = node => {
     })
   }
   nodeDOMMap.set(node, dom)
+  if (parentDOM) {
+    parentDOM.appendChild(dom)
+    node.mounted = true
+    node.dom = dom
+  }
 
   return dom
 }
-
-// componentDidMount 从最深的组件向上冒泡
-// 目前的方式会在最深的组件都构建完成之后才 appendChild，这样在深组件 componentDidMount
-// 里面获取父级的 dom 会获取不到

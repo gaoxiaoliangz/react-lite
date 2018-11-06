@@ -8,7 +8,6 @@ import { checkElement } from './element'
  * @param {*} prevNode
  * @returns {{type: 'added' | 'textChanged' | 'attributeChanged' | 'removed' | 'reordered', payload: any}[]}
  */
-//  * @returns {{attributeChanged, removed, added, textChanged, reordered}}
 const diff = (node, prevNode, results = []) => {
   if (
     node.nodeType !== prevNode.nodeType ||

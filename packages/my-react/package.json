@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.117",
+    "invariant": "^2.2.4",
     "lodash": "^4.17.11"
   }
 }

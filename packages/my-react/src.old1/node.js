@@ -3,7 +3,8 @@ import _ from 'lodash'
 import { checkElement } from './element'
 import { arrayGuard, getAttrs } from './utils'
 import diff from './diff'
-import { applyPatches } from './dom'
+import { applyPatches, removeNodeListeners, addNodeListeners } from './dom'
+import { nodeDOMMap } from './store'
 
 const eventMap = {
   onClick: 'click',
@@ -14,7 +15,7 @@ const processChildren = (
   children,
   createNode,
   prefix = '__root_',
-  parentNode,
+  parentNode
 ) => {
   let output = []
   const childrenArr = arrayGuard(children)
@@ -26,8 +27,8 @@ const processChildren = (
           childElement,
           createNode,
           `${prefix}${idx}_>`,
-          parentNode,
-        ),
+          parentNode
+        )
       )
     } else {
       let key
@@ -45,10 +46,48 @@ const processChildren = (
   return output
 }
 
-export const createNode = (reactElement, key, parentNode) => {
+const handleStateChange = ({ prevNode, state, callback }) => {
+  // before render
+  // remove all listeners
+  removeNodeListeners(prevNode)
+
+  // @ts-ignore
+  setImmediate(() => {
+    // render with new state
+    const prevState = instance.state
+    const prevProps = props
+    instance.state = {
+      ...prevState,
+      ...state,
+    }
+    const newInnerNode = createNode(instance.render(), null, node)
+
+    // diff rendered node with previous node
+    const diffResult = diff(newInnerNode, innerNode)
+    innerNode = newInnerNode
+
+    // patch dom with diffs
+    applyPatches(diffResult)
+    // @todo
+    // add new nodes & clean up old nodes
+
+    // update listeners
+    addNodeListeners(newInnerNode)
+
+    // componentDidUpdate
+    if (instance.componentDidUpdate) {
+      instance.componentDidUpdate(prevProps, prevState)
+    }
+
+    // everything is done, lets callback
+    callback()
+  })
+}
+
+export const createNode = (reactElement, { key, parentNode }) => {
   const eleType = checkElement(reactElement)
   // @ts-ignore
-  const { type, props, key: _key, ...rest } = reactElement || {}
+  const { type, props, key: _key, ref } = reactElement || {}
   const _store = {
     element: reactElement,
   }
@@ -59,6 +98,7 @@ export const createNode = (reactElement, key, parentNode) => {
   let textContent
   let childNodes = []
   let finalKey = key || _key
+  let classInstance
   const node = {
     parentNode,
   }
@@ -66,45 +106,26 @@ export const createNode = (reactElement, key, parentNode) => {
   switch (eleType) {
     case 'class': {
       nodeType = -1
-      const instance = new type(props)
-      _store.instance = instance
-      instance._setNotifier((state, cb) => {
-        // @ts-ignore
-        setImmediate(() => {
-          // render with new state
-          const prevState = instance.state
-          const prevProps = props
-          instance.state = {
-            ...prevState,
-            ...state,
-          }
-          const newInnerNode = createNode(instance.render(), null, node)
-
-          // diff rendered node with previous node
-          const diffResult = diff(newInnerNode, innerNode)
-
-          // patch dom with diffs
-          applyPatches(diffResult)
-          // @todo
-          // clean up old nodes
-
-          // componentDidUpdate
-          if (instance.componentDidUpdate) {
-            instance.componentDidUpdate(prevProps, prevState)
-          }
-
-          // everything is done, lets callback
-          if (cb) cb()
+      // @todo handle instance
+      classInstance = new type(props)
+      classInstance._setNotifier((state, cb) => {
+        handleStateChange({
+          prevNode: innerNode,
+          state,
+          callback: cb,
         })
       })
-      const innerNode = createNode(instance.render(), null, node)
+      let innerNode = createNode(instance.render(), {
+        key: null,
+        parentNode: node,
+      })
       childNodes = [innerNode]
       break
     }
 
     case 'func': {
       nodeType = -1
-      childNodes = [createNode(type(props), null, node)]
+      childNodes = [createNode(type(props), { key: null, parentNode: node })]
       break
     }
 
@@ -114,7 +135,7 @@ export const createNode = (reactElement, key, parentNode) => {
         props.children,
         createNode,
         undefined,
-        node,
+        node
       )
       childNodes = processedChildren
 
@@ -132,9 +153,11 @@ export const createNode = (reactElement, key, parentNode) => {
       tagName = type
       attributes = getAttrs(props)
       const eventProps = _.pick(props, _.keys(eventMap))
-      listeners = _.mapKeys(eventProps, (handler, key) => {
-        return eventMap[key]
-      })
+      if (!_.isEmpty(eventProps)) {
+        listeners = _.mapKeys(eventProps, (handler, key) => {
+          return eventMap[key]
+        })
+      }
 
       break
     }
@@ -151,7 +174,7 @@ export const createNode = (reactElement, key, parentNode) => {
   }
 
   return Object.assign(node, {
-    ...rest,
+    ref,
     nodeType,
     tagName,
     textContent,
@@ -159,6 +182,11 @@ export const createNode = (reactElement, key, parentNode) => {
     childNodes,
     listeners,
     key: finalKey,
-    _store,
+    // @todo
+    // _store,
+    classInstance,
+    element: reactElement,
+    mounted: false,
+    dom: null,
   })
 }
