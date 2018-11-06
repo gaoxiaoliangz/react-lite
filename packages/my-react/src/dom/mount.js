@@ -1,28 +1,46 @@
-import { getElementFlag } from "../element";
+import { getElementFlag } from '../element'
+import { createVNodeFromElement } from '../vnode'
 
+const mountClassComponent = (vNode, parentDOM) => {
+  if (vNode.instance) {
+  }
+  const instance = new vNode.type(vNode.props, {
+    vNode,
+  })
+  const rendered = instance.render()
+  mount(rendered, parentDOM)
+}
 
+const mountFunctionComponent = (vNode, parentDOM) => {
+  const rendered = vNode.type(vNode.props)
+  mount(rendered, parentDOM)
+}
 
+const mountText = (vNode, parentDOM) => {
+  // parentDOM.
+}
 
-const mount = element => {
+const mountElement = (vNode, parentDOM) => {}
 
-  const flag = getElementFlag(element)
+const mount = (element, parentDOM) => {
+  const vNode = createVNodeFromElement(element)
+  const { flag } = vNode
 
   switch (flag) {
     case 'class':
-      
-      break;
+      mountClassComponent(vNode, parentDOM)
+      break
 
     case 'func':
-
-    case 'dom':
+      mountFunctionComponent(vNode, parentDOM)
+      break
+    case 'element':
 
     case 'text':
-  
+
     default:
-      break;
+      break
   }
-
-
 }
 
 export default mount

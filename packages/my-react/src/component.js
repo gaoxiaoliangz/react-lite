@@ -1,14 +1,19 @@
 export default class Component {
-  constructor(props) {
+  constructor(props, context) {
     this.props = props
-  }
-
-  _setNotifier(notifier) {
-    this._notifier = notifier
+    this.$context = context
   }
 
   setState(state, cb) {
-    this._notifier(state, cb)
+    setTimeout(() => {
+      this.state = {
+        ...this.state,
+        ...state,
+      }
+      const rendered = this.render()
+      const newVNode = createVNodeFromElement(rendered)
+      patch(newVNode, this.$context.vNode)
+    })
   }
 }
 
