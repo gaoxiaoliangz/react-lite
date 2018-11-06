@@ -11,11 +11,15 @@ import manuallyKeyedTest from './tests/diffTests/manuallyKeyedTest'
 import reorderTextNodes from './tests/diffTests/reorderTextNodes'
 import unkeyedTest from './tests/diffTests/unkeyedTest'
 import reorderTextNodes2 from './tests/diffTests/reorderTextNodes2'
+import nestedKeyedTest from './tests/diffTests/nestedKeyedTest'
 
 export default (React, { onUpdate }) => {
   const tests = [
     {
       test: keyedTest,
+    },
+    {
+      test: nestedKeyedTest,
     },
     {
       test: manuallyKeyedTest,

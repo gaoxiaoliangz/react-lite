@@ -2,7 +2,7 @@ import section from '../../section'
 
 export default React => {
   const Section = section(React)
-  class KeyedTest extends React.Component {
+  class NestedKeyedTest extends React.Component {
     state = {
       showFirst: false,
     }
@@ -21,24 +21,36 @@ export default React => {
       const { showFirst } = this.state
       const stuff = (
         <div>
-          {showFirst ? <section>0</section> : null}
-          <section
-            ref={ref => {
-              this.item = ref
-            }}
-          >
-            1
-          </section>
-          <section>2</section>
+          {showFirst ? (
+            <div>
+              <div>
+                <div>0</div>
+              </div>
+            </div>
+          ) : null}
+          <div>
+            <div>
+              <div
+                ref={ref => {
+                  this.item = ref
+                }}
+              >
+                1
+              </div>
+            </div>
+          </div>
+          <div>
+            <div>
+              <div>2</div>
+            </div>
+          </div>
         </div>
       )
-      console.log(showFirst, 'in render')
       return (
-        <Section title="keyed test">
+        <Section title="nested keyed test">
           <div>
             <button
               onClick={() => {
-                console.log(showFirst)
                 this.setState({
                   showFirst: !showFirst,
                 })
@@ -52,5 +64,5 @@ export default React => {
       )
     }
   }
-  return KeyedTest
+  return NestedKeyedTest
 }
