@@ -12,9 +12,13 @@ import reorderTextNodes from './tests/diffTests/reorderTextNodes'
 import unkeyedTest from './tests/diffTests/unkeyedTest'
 import reorderTextNodes2 from './tests/diffTests/reorderTextNodes2'
 import nestedKeyedTest from './tests/diffTests/nestedKeyedTest'
+import nestedStateTest from './tests/diffTests/nestedStateTest'
 
 export default (React, { onUpdate }) => {
   const tests = [
+    {
+      test: nestedStateTest,
+    },
     {
       test: keyedTest,
     },
