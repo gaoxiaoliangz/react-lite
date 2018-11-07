@@ -1,12 +1,18 @@
 import { FLAGS } from '../vnode'
 import { updateAttrs } from './utils'
+import { addListeners } from './event'
 
 const createElement = vNode => {
+  const { ref } = vNode
   const dom = document.createElement(vNode.type)
   updateAttrs(dom, vNode.attributes)
+  addListeners(dom, vNode.listeners)
   vNode.children.forEach(child => {
     mount(child, dom)
   })
+  if (ref) {
+    ref(dom)
+  }
   return dom
 }
 
@@ -24,8 +30,12 @@ const mountClassComponent = (vNode, parentDOM) => {
   const instance = new vNode.type(vNode.props, {
     vNode,
   })
+  vNode.instance = instance
   const rendered = instance.render()
   mount(rendered, parentDOM)
+  if (instance.componentDidMount) {
+    instance.componentDidMount()
+  }
 }
 
 const mountFunctionComponent = (vNode, parentDOM) => {
@@ -35,14 +45,14 @@ const mountFunctionComponent = (vNode, parentDOM) => {
 
 const mountText = (vNode, parentDOM) => {
   const textNode = createTextElement(vNode, parentDOM)
-  if (textNode) {
-    parentDOM.appendChild(textNode)
-  }
+  parentDOM.appendChild(textNode)
+  vNode.dom = textNode
 }
 
 const mountElement = (vNode, parentDOM) => {
   const dom = createElement(vNode)
   parentDOM.appendChild(dom)
+  vNode.dom = dom
 }
 
 const mount = (vNode, parentDOM) => {

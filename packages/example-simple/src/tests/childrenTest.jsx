@@ -6,7 +6,6 @@ export default React => {
     const Section = section(React)
 
     const Block = ({ title, children }) => {
-      console.log(children)
       return (
         <div>
           <h4>{title}</h4>
@@ -22,8 +21,6 @@ export default React => {
         <span>and the other</span>
       </Block>
     )
-
-    console.log(theThirdBlock)
 
     const content = (
       <Section title="children test">

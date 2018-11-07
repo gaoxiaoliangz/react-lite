@@ -18,7 +18,7 @@ const isTextElement = element => {
 }
 
 class VNode {
-  constructor({ type, props = {}, children = [], ref, key, textContent }) {
+  constructor({ type, props = {}, children = [], key, textContent }) {
     if (type) {
       this.type = type
       this.props = {
@@ -28,7 +28,7 @@ class VNode {
           children: children.length === 1 ? children[0] : children,
         }),
       }
-      this.ref = ref
+      this.ref = props.ref
     }
     this.children = processChildren(children)
     this.key = key
@@ -39,6 +39,7 @@ class VNode {
     this.dom = null
     this.attributes = null
     this.listeners = null
+    this.instance = null
   }
 }
 
