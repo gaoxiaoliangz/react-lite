@@ -17,4 +17,4 @@ export default class Component {
   }
 }
 
-Component._isClass = true
+Component.$IS_CLASS = true

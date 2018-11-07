@@ -4,6 +4,27 @@ import _ from 'lodash'
 export default React => {
   const ChildrenTest = () => {
     const Section = section(React)
+
+    const Block = ({ title, children }) => {
+      console.log(children)
+      return (
+        <div>
+          <h4>{title}</h4>
+          {children}
+        </div>
+      )
+    }
+
+    const theThirdBlock = (
+      <Block title="block with nested child">
+        {[1, 2, 3, [4, 5, [6, 7]]]}
+        <span>the child</span>
+        <span>and the other</span>
+      </Block>
+    )
+
+    console.log(theThirdBlock)
+
     const content = (
       <Section title="children test">
         {React.createElement(
@@ -31,8 +52,19 @@ export default React => {
           [1, 2, 3],
           'str',
           'str2',
-          ['str3', 'str4', ['str5', 'str6', ['str7']]],
+          ['str3', 'str4', ['str5', 'str6', ['str7']]]
         )}
+        <div>
+          <Block title="block with no child" />
+          <Block title="block with one child">
+            <span>the child</span>
+          </Block>
+          <Block title="block with two child">
+            <span>the child</span>
+            <span>and the other</span>
+          </Block>
+          {theThirdBlock}
+        </div>
       </Section>
     )
     return content
