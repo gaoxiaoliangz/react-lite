@@ -2,7 +2,7 @@ import { FLAGS } from '../vnode'
 import { updateAttrs } from './utils'
 import { addListeners } from './event'
 
-const createElement = vNode => {
+const createDOMElement = vNode => {
   const { ref } = vNode
   const dom = document.createElement(vNode.type)
   updateAttrs(dom, vNode.attributes)
@@ -16,10 +16,10 @@ const createElement = vNode => {
   return dom
 }
 
-const createTextElement = vNode => {
+const createDOMTextElement = vNode => {
   const type = typeof vNode.textContent
   const textContent =
-    type === 'number' || type === 'string' ? vNode.textContent : ''
+    type === 'number' || type === 'string' ? vNode.textContent.toString() : ''
   const dom = document.createTextNode(textContent)
   return dom
 }
@@ -61,14 +61,14 @@ const mountFunctionComponent = (vNode, parentDOM, prevSibling) => {
 }
 
 const mountText = (vNode, parentDOM, prevSibling) => {
-  const textNode = createTextElement(vNode, parentDOM)
+  const textNode = createDOMTextElement(vNode, parentDOM)
   mountChild(textNode, parentDOM, prevSibling)
   vNode.dom = textNode
   return textNode
 }
 
 const mountElement = (vNode, parentDOM, prevSibling) => {
-  const dom = createElement(vNode)
+  const dom = createDOMElement(vNode)
   mountChild(dom, parentDOM, prevSibling)
   vNode.dom = dom
   return dom

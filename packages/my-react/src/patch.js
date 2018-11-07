@@ -28,15 +28,23 @@ const patchElement = (vNode, prevVNode) => {
   vNode.dom = prevVNode.dom
   removeListeners(prevVNode.dom, prevVNode.listeners)
   addListeners(vNode.dom, vNode.listeners)
-  patchChildren(vNode.children, prevVNode.children)
+  patchChildren(vNode.children, prevVNode.children, prevVNode.dom)
 }
 
 const patchTextElement = (vNode, prevVNode) => {
   if (vNode.textContent !== prevVNode.textContent) {
     const idx = getNodeIndex(prevVNode.dom)
-    prevVNode.dom.childNodes[idx].textContent = vNode.textContent
+    const type = typeof vNode.textContent
+    const textContent =
+      type === 'number' || type === 'string' ? vNode.textContent.toString() : ''
+    if (textContent) {
+      prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
+      vNode.dom = prevVNode.dom
+    } else {
+      mount(vNode, prevVNode.dom.parentNode)
+      unmount(prevVNode)
+    }
   }
-  vNode.dom = prevVNode.dom
 }
 
 const patch = (vNode, prevVNode) => {
@@ -65,7 +73,7 @@ const patch = (vNode, prevVNode) => {
   }
 }
 
-export const patchChildren = (currentChildren, lastChildren) => {
+export const patchChildren = (currentChildren, lastChildren, parentDOM) => {
   const lastNodeInUse = []
   let results = []
   currentChildren.forEach((currentVNode, idx) => {
@@ -80,15 +88,7 @@ export const patchChildren = (currentChildren, lastChildren) => {
         lastNodeInUse.push(lastChildren.indexOf(match))
         patch(currentVNode, match)
       } else {
-        console.log('todo patch child')
-        // results.push({
-        //   type: 'added',
-        //   payload: {
-        //     node: currentVNode,
-        //     parentNode,
-        //     previousSiblingNode: lastChildren[idx - 1],
-        //   },
-        // })
+        mount(currentVNode, parentDOM)
       }
     }
   })

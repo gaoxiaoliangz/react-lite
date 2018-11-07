@@ -28,9 +28,11 @@ export default React => {
               toggle first
             </button>
           </div>
-          {showFirst && '0'}
-          {'1'}
-          {'2'}
+          <div className="texts">
+            {showFirst && '0'}
+            {'1'}
+            {'2'}
+          </div>
         </Section>
       )
     }
