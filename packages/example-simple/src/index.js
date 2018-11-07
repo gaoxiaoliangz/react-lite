@@ -19,9 +19,7 @@ const render = () => {
     domNode: document.getElementById('root'),
     renderFn: MyReactDOM.render,
     react: MyReact,
-    onUpdate: () => {
-      console.log('update from my react')
-    },
+    onUpdate: () => {},
   })
 
   // mount({

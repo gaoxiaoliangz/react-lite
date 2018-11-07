@@ -17,3 +17,13 @@ export function updateAttrs(dom, attrsObject) {
     dom.setAttribute(k, v)
   })
 }
+
+export function getNodeIndex(node) {
+  const parent = node.parentNode
+  for (let index = 0; parent.childNodes.length > index; index++) {
+    if (node === parent.childNodes[index]) {
+      return index
+    }
+  }
+  return -1
+}

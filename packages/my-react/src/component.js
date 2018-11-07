@@ -1,3 +1,5 @@
+import patch from './patch'
+
 export default class Component {
   constructor(props, context) {
     this.props = props
@@ -6,13 +8,18 @@ export default class Component {
 
   setState(state, cb) {
     setTimeout(() => {
+      const oldState = this.state
       this.state = {
-        ...this.state,
+        ...oldState,
         ...state,
       }
       const rendered = this.render()
-      const newVNode = createVNodeFromElement(rendered)
-      patch(newVNode, this.$context.vNode)
+      patch(rendered, this.$context.vNode.rendered)
+      this.$context.vNode.rendered = rendered
+      if (cb) cb()
+      if (this.componentDidUpdate) {
+        this.componentDidUpdate(this.props, oldState)
+      }
     })
   }
 }

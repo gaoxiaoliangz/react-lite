@@ -24,51 +24,68 @@ const createTextElement = vNode => {
   return dom
 }
 
-const mountClassComponent = (vNode, parentDOM) => {
-  if (vNode.instance) {
-  }
+const mountChild = (child, parent, prevSibling) => {
+  // if (prevSibling) {
+  // } else {
+  //   parent.appendChild(child)
+  // }
+  // parent.insertBefore(child, prevSibling.nextSibling || parent.childNodes[0])
+  parent.appendChild(child)
+}
+
+// mount
+const mountClassComponent = (vNode, parentDOM, prevSibling) => {
   const instance = new vNode.type(vNode.props, {
     vNode,
   })
   vNode.instance = instance
   const rendered = instance.render()
-  mount(rendered, parentDOM)
+  vNode.rendered = rendered
+  instance.$context = {
+    vNode,
+  }
+  const dom = mount(rendered, parentDOM, prevSibling)
   if (instance.componentDidMount) {
     instance.componentDidMount()
   }
-}
-
-const mountFunctionComponent = (vNode, parentDOM) => {
-  const rendered = vNode.type(vNode.props)
-  mount(rendered, parentDOM)
-}
-
-const mountText = (vNode, parentDOM) => {
-  const textNode = createTextElement(vNode, parentDOM)
-  parentDOM.appendChild(textNode)
-  vNode.dom = textNode
-}
-
-const mountElement = (vNode, parentDOM) => {
-  const dom = createElement(vNode)
-  parentDOM.appendChild(dom)
   vNode.dom = dom
+  return dom
 }
 
-const mount = (vNode, parentDOM) => {
+const mountFunctionComponent = (vNode, parentDOM, prevSibling) => {
+  const rendered = vNode.type(vNode.props)
+  vNode.rendered = rendered
+  const dom = mount(rendered, parentDOM, prevSibling)
+  vNode.dom = dom
+  return dom
+}
+
+const mountText = (vNode, parentDOM, prevSibling) => {
+  const textNode = createTextElement(vNode, parentDOM)
+  mountChild(textNode, parentDOM, prevSibling)
+  vNode.dom = textNode
+  return textNode
+}
+
+const mountElement = (vNode, parentDOM, prevSibling) => {
+  const dom = createElement(vNode)
+  mountChild(dom, parentDOM, prevSibling)
+  vNode.dom = dom
+  return dom
+}
+
+const mount = (vNode, parentDOM, prevSibling) => {
   const { flag } = vNode
 
   switch (flag) {
     case FLAGS.CLASS:
-      mountClassComponent(vNode, parentDOM)
-      break
+      return mountClassComponent(vNode, parentDOM, prevSibling)
     case FLAGS.FUNC:
-      mountFunctionComponent(vNode, parentDOM)
-      break
+      return mountFunctionComponent(vNode, parentDOM, prevSibling)
     case FLAGS.ELEMENT:
-      mountElement(vNode, parentDOM)
+      return mountElement(vNode, parentDOM, prevSibling)
     case FLAGS.TEXT:
-      mountText(vNode, parentDOM)
+      return mountText(vNode, parentDOM, prevSibling)
     default:
       break
   }

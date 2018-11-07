@@ -30,7 +30,18 @@ class VNode {
       }
       this.ref = props.ref
     }
-    this.children = processChildren(children)
+    this.children = processChildren(children, undefined, this)
+
+    // validate keys
+    const keys = this.children.map(child => child.key)
+    const uniqueKeys = _.union(keys)
+    const print = arr => console.log(arr.sort().join(', '))
+    if (keys.length !== uniqueKeys.length) {
+      console.error('key should be unique!')
+      print(uniqueKeys)
+      print(keys)
+    }
+
     this.key = key
     this.validated = false
     this.textContent = textContent
@@ -40,6 +51,7 @@ class VNode {
     this.attributes = null
     this.listeners = null
     this.instance = null
+    this.rendered = null
   }
 }
 

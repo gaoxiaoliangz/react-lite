@@ -32,13 +32,11 @@ export default React => {
           <section>2</section>
         </div>
       )
-      console.log(showFirst, 'in render')
       return (
         <Section title="keyed test">
           <div>
             <button
               onClick={() => {
-                console.log(showFirst)
                 this.setState({
                   showFirst: !showFirst,
                 })
