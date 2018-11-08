@@ -24,7 +24,7 @@ export default React => {
           <button onClick={this.handleMinusClick}>-</button>
           {clicks}
           <button onClick={() => this.updateClicks(clicks + 1)}>
-            + (inline)
+            + (inline func)
           </button>
         </div>
       )

@@ -11,7 +11,11 @@ import reorderTextNodes from './tests/diffTests/reorderTextNodes'
 import unkeyedTest from './tests/diffTests/unkeyedTest'
 import reorderTextNodes2 from './tests/diffTests/reorderTextNodes2'
 import nestedKeyedTest from './tests/diffTests/nestedKeyedTest'
-import nestedStateTest from './tests/setStateTests/nestedStateTest'
+import propTest from './tests/setStateTests/propTest'
+import setStateWithChildren from './tests/setStateTests/setStateWithChildren'
+import multipleSetStateCalls from './tests/setStateTests/multipleSetStateCalls'
+import callbackAndSetState from './tests/setStateTests/callbackAndSetState'
+import mutateState from './tests/setStateTests/mutateState'
 // import reactReduxTest from './tests/reactReduxTest'
 
 export default (React, { onUpdate }) => {
@@ -39,8 +43,24 @@ export default (React, { onUpdate }) => {
           desc: 'setStateTest basic',
         },
         {
-          test: nestedStateTest,
-          desc: 'nested state test',
+          test: propTest,
+          desc: 'prop test',
+        },
+        {
+          test: setStateWithChildren,
+          desc: 'setStateWithChildren',
+        },
+        {
+          test: multipleSetStateCalls,
+          desc: 'multipleSetStateCalls',
+        },
+        {
+          test: callbackAndSetState,
+          desc: 'callbackAndSetState',
+        },
+        {
+          test: mutateState,
+          desc: 'mutateState',
         },
       ],
     },
