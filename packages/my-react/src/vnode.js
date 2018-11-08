@@ -52,19 +52,6 @@ class VNode {
     this.instance = null
     this.rendered = null
   }
-
-  get listeners() {
-    if (typeof this.type !== 'string') {
-      return null
-    }
-    const eventProps = _.pick(this.props, _.keys(eventMap))
-    if (!_.isEmpty(eventProps)) {
-      return _.mapKeys(eventProps, (handler, key) => {
-        return eventMap[key]
-      })
-    }
-    return null
-  }
 }
 
 // generate unique keys & flatten children
@@ -99,12 +86,14 @@ export const createVNode = (type, props, children) => {
   if (typeof type === 'string') {
     node.flag = FLAGS.ELEMENT
     node.attributes = getAttrs(node.props)
-    // const eventProps = _.pick(node.props, _.keys(eventMap))
-    // if (!_.isEmpty(eventProps)) {
-    //   node.listeners = _.mapKeys(eventProps, (handler, key) => {
-    //     return eventMap[key]
-    //   })
-    // }
+    // 因为在每次 render 的时候都会创建新的 vNode，所以写成 getter 没什么意义
+    // 只会使得性能变差
+    const eventProps = _.pick(node.props, _.keys(eventMap))
+    if (!_.isEmpty(eventProps)) {
+      node.listeners = _.mapKeys(eventProps, (handler, key) => {
+        return eventMap[key]
+      })
+    }
   } else if (type.$IS_CLASS) {
     node.flag = FLAGS.CLASS
   } else {

@@ -48,41 +48,62 @@ export default React => {
     }
   }
 
-  // const Click = () => {
-  //   return (
-  //     <div>
-  //       event test:{' '}
-  //       <button
-  //         onClick={() => {
-  //           console.log('clicked')
-  //         }}
-  //       >
-  //         click
-  //       </button>
-  //     </div>
-  //   )
-  // }
+  const Click = () => {
+    return (
+      <div>
+        event test:{' '}
+        <button
+          onClick={() => {
+            console.log('clicked')
+          }}
+        >
+          click
+        </button>
+      </div>
+    )
+  }
 
-  // class Click2 extends React.Component {
-  //   state = {}
+  class Click2 extends React.Component {
+    state = {}
 
-  //   render() {
-  //     return (
-  //       <div>
-  //         event test (class):{' '}
-  //         <button
-  //           onClick={() => {
-  //             console.log('clicked')
-  //             this.setState({})
-  //           }}
-  //         >
-  //           click
-  //         </button>
-  //         {this.props.children}
-  //       </div>
-  //     )
-  //   }
-  // }
+    render() {
+      return (
+        <div>
+          event test (class):{' '}
+          <button
+            onClick={() => {
+              console.log('clicked')
+              this.setState({})
+            }}
+          >
+            click
+          </button>
+          {this.props.children}
+        </div>
+      )
+    }
+  }
+
+  class Click3 extends React.Component {
+    state = {}
+
+    render() {
+      return (
+        <div>
+          event test (class):{' '}
+          <button
+            onClick={() => {
+              console.log('clicked')
+              this.setState({})
+            }}
+          >
+            click
+          </button>
+          {this.props.children}
+        </div>
+      )
+    }
+  }
 
   const DispCount = ({ count }) => (
     <div>count in DispCount component: {count}</div>
@@ -118,10 +139,10 @@ export default React => {
             <div>{clicks}</div>
             <DispCount count={clicks} />
             <SetStateTest count={clicks} />
-            {/* <Click />
+            <Click />
             <Click2>
-              <Click2 />
-            </Click2> */}
+              <Click3 />
+            </Click2>
           </div>
         </Section>
       )

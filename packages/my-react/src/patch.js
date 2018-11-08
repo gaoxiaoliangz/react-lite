@@ -10,6 +10,8 @@ import { removeListeners, addListeners } from './dom/event'
 const patchClassComponent = (vNode, prevVNode) => {
   vNode.instance = prevVNode.instance
   vNode.instance.props = vNode.props
+  // 因为这个问题排查了很久，一开始表现为 dom 为 null，事件触发两次
+  vNode.instance.$context.vNode = vNode
   const newRendered = prevVNode.instance.render()
   vNode.rendered = newRendered
   vNode.dom = prevVNode.dom
@@ -34,9 +36,7 @@ const patchElement = (vNode, prevVNode) => {
   vNode.dom = prevVNode.dom
   invariant(prevVNode.dom !== null, 'patchElement dom null')
   removeListeners(prevVNode.dom, prevVNode.listeners)
-  // if (prevVNode.listeners) console.log('removed listener', prevVNode.dom, prevVNode.listeners)
   addListeners(vNode.dom, vNode.listeners)
-  // if (vNode.listeners) console.log(vNode.dom, vNode.listeners)
   patchChildren(vNode.children, prevVNode.children, prevVNode.dom)
 }
 
