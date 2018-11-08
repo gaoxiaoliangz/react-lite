@@ -62,6 +62,8 @@ const patchTextElement = (vNode, prevVNode) => {
 }
 
 const patch = (vNode, prevVNode) => {
+  // @todo 是否必要？
+  // vNode.parent = prevVNode.parent
   const { flag, type } = vNode
 
   if (prevVNode.flag !== flag || type !== prevVNode.type) {

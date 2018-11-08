@@ -25,7 +25,7 @@ export default React => {
       const { count } = this.props
       const { clicks } = this.state
       return (
-        <div>
+        <div className="SetStateTest">
           <button onClick={this.handleMinusClick}>-</button>
           {clicks + count}
           <button
@@ -50,8 +50,8 @@ export default React => {
 
   const Click = () => {
     return (
-      <div>
-        event test:{' '}
+      <div className="click">
+        event test click:{' '}
         <button
           onClick={() => {
             console.log('clicked')
@@ -68,8 +68,8 @@ export default React => {
 
     render() {
       return (
-        <div>
-          event test (class):{' '}
+        <div className="click2">
+          event test click2 (class):{' '}
           <button
             onClick={() => {
               console.log('clicked')
@@ -89,8 +89,8 @@ export default React => {
 
     render() {
       return (
-        <div>
-          event test (class):{' '}
+        <div className="click3">
+          event test click3 (class):{' '}
           <button
             onClick={() => {
               console.log('clicked')

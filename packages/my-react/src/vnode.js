@@ -17,6 +17,8 @@ const isTextElement = element => {
   return !(element instanceof VNode)
 }
 
+let debugId = 0
+
 class VNode {
   constructor({ type, props = {}, children = [], key, textContent }) {
     if (type) {
@@ -50,7 +52,11 @@ class VNode {
     this.dom = null
     this.attributes = null
     this.instance = null
-    this.rendered = null
+    this._debugId = debugId
+    debugId++
+    if (typeof type === 'function') {
+      this.rendered = null
+    }
   }
 }
 
