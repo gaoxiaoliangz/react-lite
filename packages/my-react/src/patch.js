@@ -41,6 +41,8 @@ const patchElement = (vNode, prevVNode) => {
 }
 
 const patchTextElement = (vNode, prevVNode) => {
+  // 这个之前居然放到判断里了，导致之前未更新的 text 节点在之后的更新里找不到 dom
+  vNode.dom = prevVNode.dom
   if (vNode.textContent !== prevVNode.textContent) {
     const idx = getNodeIndex(prevVNode.dom)
     const type = typeof vNode.textContent
@@ -48,7 +50,6 @@ const patchTextElement = (vNode, prevVNode) => {
       type === 'number' || type === 'string' ? vNode.textContent.toString() : ''
 
     prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
-    vNode.dom = prevVNode.dom
     invariant(prevVNode.dom !== null, 'patchTextElement dom null')
 
     // if (textContent) {
@@ -62,6 +63,9 @@ const patchTextElement = (vNode, prevVNode) => {
 }
 
 const patch = (vNode, prevVNode) => {
+  if (vNode === prevVNode) {
+    return
+  }
   // @todo 是否必要？
   // vNode.parent = prevVNode.parent
   const { flag, type } = vNode
