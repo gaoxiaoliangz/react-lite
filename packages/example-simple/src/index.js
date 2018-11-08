@@ -44,7 +44,7 @@ const render = () => {
         if (diff) {
           console.log(diff.join('\n'))
         } else {
-          console.log('diffRendered: They are same')
+          console.log('diffRendered: They are the same')
         }
       }, 100)
     },
