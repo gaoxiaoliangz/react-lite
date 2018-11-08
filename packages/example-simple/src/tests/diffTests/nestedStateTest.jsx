@@ -72,8 +72,10 @@ export default React => {
           event test click2 (class):{' '}
           <button
             onClick={() => {
-              console.log('clicked')
-              this.setState({})
+              // this.setState({})
+              if (this.props.onCb) {
+                this.props.onCb()
+              }
             }}
           >
             click
@@ -90,7 +92,8 @@ export default React => {
     render() {
       return (
         <div className="click3">
-          event test click3 (class):{' '}
+          event test click3 (class):
+          {this.props.label && <span>from prop: {this.props.label}</span>}{' '}
           <button
             onClick={() => {
               console.log('clicked')
@@ -112,6 +115,7 @@ export default React => {
   class NestedStateTest extends React.Component {
     state = {
       clicks: 0,
+      testCbClicks: 0,
     }
 
     updateClicks = clicks => {
@@ -127,12 +131,12 @@ export default React => {
       this.updateClicks(this.state.clicks - 1)
     }
 
-    componentDidMount() {
-      if (this.$context) console.log(this.$context.vNode)
-    }
+    // componentDidMount() {
+    //   if (this.$context) console.log(this.$context.vNode)
+    // }
 
     render() {
-      const { clicks } = this.state
+      const { clicks, testCbClicks } = this.state
       return (
         <Section title="nested state test">
           <div>
@@ -140,13 +144,45 @@ export default React => {
             <button onClick={() => this.updateClicks(clicks + 1)}>
               + (inline)
             </button>
-            <div>{clicks}</div>
-            <DispCount count={clicks} />
-            <SetStateTest count={clicks} />
-            <Click />
-            <Click2>
+            <button
+              onClick={() => {
+                this.setState({
+                  clicks: clicks + 1,
+                  testCbClicks: testCbClicks + 1,
+                })
+              }}
+            >
+              update clicks
+            </button>
+            <button
+              onClick={() => {
+                this.setState({
+                  testCbClicks: testCbClicks + 1,
+                })
+              }}
+            >
+              update testCbClicks
+            </button>
+            <div>clicks: {clicks}</div>
+            <div>testCbClicks: {testCbClicks}</div>
+            {/* <DispCount count={clicks} /> */}
+            {/* <SetStateTest count={clicks} /> */}
+            {/* <Click /> */}
+            {/* <Click2>
               <Click3 />
             </Click2>
+            <Click2>
+              <Click2 />
+            </Click2> */}
+            {/* <Click2
+              onCb={() => {
+                this.setState({
+                  testCbClicks: testCbClicks + 1,
+                })
+              }}
+            >
+              <Click3 label={testCbClicks} />
+            </Click2> */}
           </div>
         </Section>
       )
