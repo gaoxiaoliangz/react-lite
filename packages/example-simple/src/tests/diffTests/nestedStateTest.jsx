@@ -1,8 +1,4 @@
-import section from '../../section'
-
 export default React => {
-  const Section = section(React)
-
   class SetStateTest extends React.Component {
     state = {
       clicks: 0,
@@ -138,7 +134,7 @@ export default React => {
     render() {
       const { clicks, testCbClicks } = this.state
       return (
-        <Section title="nested state test">
+        <div>
           <div>
             <button onClick={this.handleMinusClick}>-</button>
             <button onClick={() => this.updateClicks(clicks + 1)}>
@@ -184,7 +180,7 @@ export default React => {
               <Click3 label={testCbClicks} />
             </Click2> */}
           </div>
-        </Section>
+        </div>
       )
     }
   }

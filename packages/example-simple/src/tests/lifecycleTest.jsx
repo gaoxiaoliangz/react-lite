@@ -1,8 +1,13 @@
-import section from '../section'
-
-// @ts-check
 export default React => {
-  const Section = section(React)
+  class InnerDeep extends React.Component {
+    componentDidMount() {
+      console.log('InnerDeep mount')
+    }
+
+    render() {
+      return <div>inner deep</div>
+    }
+  }
 
   class Inner extends React.Component {
     componentDidMount() {
@@ -19,16 +24,6 @@ export default React => {
     }
   }
 
-  class InnerDeep extends React.Component {
-    componentDidMount() {
-      console.log('InnerDeep mount')
-    }
-
-    render() {
-      return <div>inner deep</div>
-    }
-  }
-
   class LifecycleTest extends React.Component {
     componentDidMount() {
       console.log('LifecycleTest mount')
@@ -36,10 +31,10 @@ export default React => {
 
     render() {
       return (
-        <Section title="lifecycle test">
+        <div>
           <div>lifecycle</div>
           <Inner />
-        </Section>
+        </div>
       )
     }
   }

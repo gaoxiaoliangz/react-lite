@@ -1,5 +1,4 @@
 import { createStore, combineReducers } from 'redux'
-import section from '../section'
 
 const updateCount = count => {
   return {
@@ -23,10 +22,8 @@ const reducers = combineReducers({
 const store = createStore(reducers)
 
 export default React => {
-  const Section = section(React)
-
   class ReduxTest extends React.Component {
-    componentWillMount() {
+    componentDidMount() {
       store.subscribe(() => {
         this.setState({})
       })
@@ -35,7 +32,7 @@ export default React => {
     render() {
       const currentCount = store.getState().count
       return (
-        <Section title="redux test">
+        <div>
           <div>
             <button
               onClick={() => {
@@ -53,7 +50,7 @@ export default React => {
               +
             </button>
           </div>
-        </Section>
+        </div>
       )
     }
   }

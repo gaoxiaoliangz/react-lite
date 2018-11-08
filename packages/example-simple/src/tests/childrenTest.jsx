@@ -1,10 +1,7 @@
-import section from '../section'
 import _ from 'lodash'
 
 export default React => {
   const ChildrenTest = () => {
-    const Section = section(React)
-
     const Block = ({ title, children }) => {
       return (
         <div>
@@ -23,7 +20,7 @@ export default React => {
     )
 
     const content = (
-      <Section title="children test">
+      <div>
         {React.createElement(
           'div',
           {},
@@ -62,7 +59,7 @@ export default React => {
           </Block>
           {theThirdBlock}
         </div>
-      </Section>
+      </div>
     )
     return content
   }

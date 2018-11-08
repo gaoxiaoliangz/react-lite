@@ -1,8 +1,6 @@
 import _ from 'lodash'
-import section from '../../section'
 
 export default React => {
-  const Section = section(React)
   class ReconcileTest2 extends React.Component {
     state = {
       showFirst: false,
@@ -21,7 +19,7 @@ export default React => {
     render() {
       const { showFirst } = this.state
       return (
-        <Section title="manually keyed test">
+        <div>
           <div>
             <button
               onClick={() => {
@@ -52,7 +50,7 @@ export default React => {
               )
             }).filter(Boolean)}
           </ul>
-        </Section>
+        </div>
       )
     }
   }

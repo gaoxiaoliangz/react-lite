@@ -1,7 +1,4 @@
-import section from '../../section'
-
 export default React => {
-  const Section = section(React)
   class NestedKeyedTest extends React.Component {
     state = {
       showFirst: false,
@@ -47,7 +44,7 @@ export default React => {
         </div>
       )
       return (
-        <Section title="nested keyed test">
+        <div>
           <div>
             <button
               onClick={() => {
@@ -60,7 +57,7 @@ export default React => {
             </button>
           </div>
           {stuff}
-        </Section>
+        </div>
       )
     }
   }

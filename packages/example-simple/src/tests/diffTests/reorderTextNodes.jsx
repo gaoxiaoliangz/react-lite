@@ -1,7 +1,4 @@
-import section from '../../section'
-
 export default React => {
-  const Section = section(React)
   class ReorderTextNodes extends React.Component {
     state = {
       showFirst: false,
@@ -16,7 +13,7 @@ export default React => {
     render() {
       const { showFirst } = this.state
       return (
-        <Section title="reorder text nodes">
+        <div>
           <div>
             <button
               onClick={() => {
@@ -33,7 +30,7 @@ export default React => {
             {'1'}
             {'2'}
           </div>
-        </Section>
+        </div>
       )
     }
   }

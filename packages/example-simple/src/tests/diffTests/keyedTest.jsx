@@ -1,7 +1,4 @@
-import section from '../../section'
-
 export default React => {
-  const Section = section(React)
   class KeyedTest extends React.Component {
     state = {
       showFirst: false,
@@ -33,7 +30,7 @@ export default React => {
         </div>
       )
       return (
-        <Section title="keyed test">
+        <div>
           <div>
             <button
               onClick={() => {
@@ -46,7 +43,7 @@ export default React => {
             </button>
           </div>
           {stuff}
-        </Section>
+        </div>
       )
     }
   }

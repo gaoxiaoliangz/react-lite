@@ -1,9 +1,7 @@
 import _ from 'lodash'
-import section from '../section'
 import './reconcileTest.css'
 
 export default React => {
-  const Section = section(React)
   // const ItemA = () => <div>itemA</div>
   // const ItemB = () => <div>itemB</div>
 
@@ -41,7 +39,7 @@ export default React => {
       // const itemA = <div ref={ref => (this.itemA = ref)}>itemA</div>
       // const itemB = <span>itemB</span>
       return (
-        <Section title="reconcile test">
+        <div>
           <div>
             <button
               onClick={() => {
@@ -66,7 +64,7 @@ export default React => {
             {orderFlag ? itemA : itemB}
             {!orderFlag ? itemA : itemB}
           </div>
-        </Section>
+        </div>
       )
     }
   }

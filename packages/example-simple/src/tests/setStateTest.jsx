@@ -1,7 +1,4 @@
-import section from '../section'
-
 export default React => {
-  const Section = section(React)
   class SetStateTest extends React.Component {
     state = {
       clicks: 0,
@@ -23,15 +20,13 @@ export default React => {
     render() {
       const { clicks } = this.state
       return (
-        <Section title="setState test">
-          <div>
-            <button onClick={this.handleMinusClick}>-</button>
-            {clicks}
-            <button onClick={() => this.updateClicks(clicks + 1)}>
-              + (inline)
-            </button>
-          </div>
-        </Section>
+        <div>
+          <button onClick={this.handleMinusClick}>-</button>
+          {clicks}
+          <button onClick={() => this.updateClicks(clicks + 1)}>
+            + (inline)
+          </button>
+        </div>
       )
     }
   }
