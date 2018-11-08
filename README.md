@@ -1,4 +1,4 @@
-# README
+# How react works
 
 ## Why creating this repo
 
@@ -8,11 +8,31 @@ The package is at very early stages of development, so only a handful of react f
 
 ## What's been included
 
-- Pure function component
-- Class component (supports setState, no lifecycle method support)
-- ReactDOM support (dom update is not fully optimized)
-- Bind component event to native dom event
+React
 
-## Next
+- createElement
+- todo: cloneElement
 
-Implement fully optimized dom update
+Function component
+
+- todo: support hooks
+
+Class component
+
+- setState
+- lifecycle methods: componentDidMount
+- todo: more lifecycle methods
+
+ReactDOM
+
+- render
+
+## How to run
+
+```
+lerna bootstrap
+yarn build --watch
+yarn start
+```
+
+The demo runs two versions of react in two columns with identical components, which I've created for testing purposes, left side is my version, right side is react.
