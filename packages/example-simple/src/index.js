@@ -1,4 +1,5 @@
 import MyReact, { ReactDOM as MyReactDOM } from 'my-react'
+import invariant from 'invariant'
 // import React3, { render as render3 } from 'inferno-compat'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -41,11 +42,7 @@ const render = () => {
           document.getElementById('root').innerHTML,
           document.getElementById('root2').innerHTML
         )
-        if (diff) {
-          console.log(diff.join('\n'))
-        } else {
-          console.log('diffRendered: They are the same')
-        }
+        invariant(!diff, `renders differently!\n${(diff || []).join('\n')}`)
       }, 100)
     },
   })

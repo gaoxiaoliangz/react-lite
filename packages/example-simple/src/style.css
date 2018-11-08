@@ -54,3 +54,12 @@ body {
 .green {
   color: green;
 }
+.red {
+  color: red;
+}
+.bg-green {
+  background: green;
+}
+.bg-red {
+  background: red;
+}

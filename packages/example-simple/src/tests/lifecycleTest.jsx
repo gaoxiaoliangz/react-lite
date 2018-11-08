@@ -1,7 +1,10 @@
+import invariant from 'invariant'
+
 export default React => {
+  const order = []
   class InnerDeep extends React.Component {
     componentDidMount() {
-      console.log('InnerDeep mount')
+      order.push(0)
     }
 
     render() {
@@ -11,7 +14,7 @@ export default React => {
 
   class Inner extends React.Component {
     componentDidMount() {
-      console.log('Inner mount')
+      order.push(1)
     }
 
     render() {
@@ -26,7 +29,8 @@ export default React => {
 
   class LifecycleTest extends React.Component {
     componentDidMount() {
-      console.log('LifecycleTest mount')
+      order.push(2)
+      invariant(order.join(',') === '0,1,2', 'order is wrong!')
     }
 
     render() {

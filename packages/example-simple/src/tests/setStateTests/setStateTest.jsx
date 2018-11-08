@@ -9,7 +9,7 @@ export default React => {
         clicks,
       })
       if (clicks === this.state.clicks) {
-        console.error('setState should be async!', clicks, this.state.clicks)
+        throw new Error('setState should be async!', clicks, this.state.clicks)
       }
     }
 

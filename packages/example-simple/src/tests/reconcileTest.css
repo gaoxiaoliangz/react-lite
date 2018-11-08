@@ -1,13 +1,6 @@
-.reconcileTest .green {
-  background: green;
+.reconcileTest .box {
   width: 20px;
   height: 20px;
   display: inline-block;
-}
-
-.reconcileTest .red {
-  background: red;
-  width: 20px;
-  height: 20px;
-  display: inline-block;
+  margin-right: 10px;
 }

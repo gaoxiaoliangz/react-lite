@@ -1,6 +1,6 @@
 import section from './section'
 import renderPrimitiveTest from './tests/renderPrimitiveTest'
-import setStateTest from './tests/setStateTest'
+import setStateTest from './tests/setStateTests/setStateTest'
 import childrenTest from './tests/childrenTest'
 import reconcileTest from './tests/reconcileTest'
 import reduxTest from './tests/reduxTest'
@@ -11,7 +11,7 @@ import reorderTextNodes from './tests/diffTests/reorderTextNodes'
 import unkeyedTest from './tests/diffTests/unkeyedTest'
 import reorderTextNodes2 from './tests/diffTests/reorderTextNodes2'
 import nestedKeyedTest from './tests/diffTests/nestedKeyedTest'
-import nestedStateTest from './tests/diffTests/nestedStateTest'
+import nestedStateTest from './tests/setStateTests/nestedStateTest'
 // import reactReduxTest from './tests/reactReduxTest'
 
 export default (React, { onUpdate }) => {
@@ -19,6 +19,7 @@ export default (React, { onUpdate }) => {
   const testGroups = [
     {
       desc: 'render tests',
+      disabled: true,
       children: [
         {
           test: renderPrimitiveTest,
@@ -35,7 +36,7 @@ export default (React, { onUpdate }) => {
       children: [
         {
           test: setStateTest,
-          desc: 'setStateTest',
+          desc: 'setStateTest basic',
         },
         {
           test: nestedStateTest,
@@ -45,6 +46,7 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: 'diff tests',
+      disabled: true,
       children: [
         {
           test: keyedTest,
@@ -74,6 +76,7 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: 'lifecycle tests',
+      disabled: true,
       children: [
         {
           test: lifecycleTest,
@@ -83,6 +86,7 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: 'misc',
+      disabled: true,
       children: [
         {
           test: reconcileTest,
@@ -92,6 +96,7 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: '3rd party integration tests',
+      disabled: true,
       children: [
         {
           test: reduxTest,

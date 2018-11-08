@@ -13,7 +13,7 @@ export default React => {
     }
 
     componentDidMount() {
-      this.flag.setAttribute('class', 'green')
+      this.flag.setAttribute('class', 'box bg-green')
       this.itemA.setAttribute('class', 'green')
     }
 
@@ -54,7 +54,7 @@ export default React => {
           </div>
           <div className="reconcileTest">
             {hasLeadingEle && <div>leading ele</div>}
-            <div className="red" ref={ref => (this.flag = ref)} />
+            <div className="box bg-red" ref={ref => (this.flag = ref)} />
             <button onClick={() => this.updateClicks(clicks - 1)}>-</button>
             {clicks}
             <button onClick={() => this.updateClicks(clicks + 1)}>+</button>
