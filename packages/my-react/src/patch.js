@@ -1,5 +1,6 @@
 // @ts-check
 import _ from 'lodash'
+import invariant from 'invariant'
 import { FLAGS } from './vnode'
 import mount from './dom/mount'
 import unmount from './dom/unmount'
@@ -7,8 +8,13 @@ import { updateAttrs, getNodeIndex } from './dom/utils'
 import { removeListeners, addListeners } from './dom/event'
 
 const patchClassComponent = (vNode, prevVNode) => {
-  console.log('todo p class')
+  vNode.instance = prevVNode.instance
+  vNode.instance.props = vNode.props
+  const newRendered = prevVNode.instance.render()
+  vNode.rendered = newRendered
   vNode.dom = prevVNode.dom
+  invariant(prevVNode.dom !== null, 'patchClassComponent dom null')
+  return patch(newRendered, prevVNode.rendered)
 }
 
 const patchFunctionComponent = (vNode, prevVNode) => {
@@ -17,6 +23,7 @@ const patchFunctionComponent = (vNode, prevVNode) => {
   // 其实可以写成 vNode.render() 然后自己更新内部状态，但那样太 OO 了
   vNode.rendered = newRendered
   vNode.dom = prevVNode.dom
+  invariant(prevVNode.dom !== null, 'patchFunctionComponent dom null')
   return patch(newRendered, prevVNode.rendered)
 }
 
@@ -24,10 +31,12 @@ const patchElement = (vNode, prevVNode) => {
   if (!_.isEqual(vNode.attributes, prevVNode.attributes)) {
     updateAttrs(vNode.dom, vNode.attributes)
   }
-  removeListeners(prevVNode.dom, prevVNode.listeners)
   vNode.dom = prevVNode.dom
+  invariant(prevVNode.dom !== null, 'patchElement dom null')
   removeListeners(prevVNode.dom, prevVNode.listeners)
+  // if (prevVNode.listeners) console.log('removed listener', prevVNode.dom, prevVNode.listeners)
   addListeners(vNode.dom, vNode.listeners)
+  // if (vNode.listeners) console.log(vNode.dom, vNode.listeners)
   patchChildren(vNode.children, prevVNode.children, prevVNode.dom)
 }
 
@@ -37,13 +46,18 @@ const patchTextElement = (vNode, prevVNode) => {
     const type = typeof vNode.textContent
     const textContent =
       type === 'number' || type === 'string' ? vNode.textContent.toString() : ''
-    if (textContent) {
-      prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
-      vNode.dom = prevVNode.dom
-    } else {
-      mount(vNode, prevVNode.dom.parentNode)
-      unmount(prevVNode)
-    }
+
+    prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
+    vNode.dom = prevVNode.dom
+    invariant(prevVNode.dom !== null, 'patchTextElement dom null')
+
+    // if (textContent) {
+    //   prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
+    //   vNode.dom = prevVNode.dom
+    // } else {
+    //   mount(vNode, prevVNode.dom.parentNode)
+    //   unmount(prevVNode)
+    // }
   }
 }
 

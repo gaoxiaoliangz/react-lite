@@ -1,3 +1,4 @@
+import invariant from 'invariant'
 import { FLAGS } from '../vnode'
 import { updateAttrs } from './utils'
 import { addListeners } from './event'
@@ -76,19 +77,27 @@ const mountElement = (vNode, parentDOM, prevSibling) => {
 
 const mount = (vNode, parentDOM, prevSibling) => {
   const { flag } = vNode
+  let dom
 
   switch (flag) {
     case FLAGS.CLASS:
-      return mountClassComponent(vNode, parentDOM, prevSibling)
-    case FLAGS.FUNC:
-      return mountFunctionComponent(vNode, parentDOM, prevSibling)
-    case FLAGS.ELEMENT:
-      return mountElement(vNode, parentDOM, prevSibling)
-    case FLAGS.TEXT:
-      return mountText(vNode, parentDOM, prevSibling)
-    default:
+      dom = mountClassComponent(vNode, parentDOM, prevSibling)
       break
+    case FLAGS.FUNC:
+      dom = mountFunctionComponent(vNode, parentDOM, prevSibling)
+      break
+    case FLAGS.ELEMENT:
+      dom = mountElement(vNode, parentDOM, prevSibling)
+      break
+    case FLAGS.TEXT:
+      dom = mountText(vNode, parentDOM, prevSibling)
+      break
+    default:
+      throw new Error(`Unknown flag ${flag}`)
   }
+
+  invariant(dom, 'mount dom null')
+  return dom
 }
 
 export default mount
