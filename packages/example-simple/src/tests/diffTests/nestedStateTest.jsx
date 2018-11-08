@@ -127,6 +127,10 @@ export default React => {
       this.updateClicks(this.state.clicks - 1)
     }
 
+    componentDidMount() {
+      if (this.$context) console.log(this.$context.vNode)
+    }
+
     render() {
       const { clicks } = this.state
       return (
