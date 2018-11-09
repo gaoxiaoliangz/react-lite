@@ -20,7 +20,7 @@ import updateAttrs from './tests/diffTests/updateAttrs'
 import unmountTest from './tests/unmountTest'
 import didUpdateTest from './tests/didUpdateTest'
 import inputTest from './tests/form/inputTest'
-import reactReduxTest from './tests/reactReduxTest'
+// import reactReduxTest from './tests/reactReduxTest'
 
 const testGroups = [
   {
@@ -144,10 +144,12 @@ const testGroups = [
         test: reduxTest,
         desc: 'reduxTest',
       },
-      {
-        test: reactReduxTest,
-        desc: 'reactReduxTest',
-      },
+      // Provider 需要 node_modules 里面的 react 依赖，这里采用的
+      // 依赖注入的方式变得不可行
+      // {
+      //   test: reactReduxTest,
+      //   desc: 'reactReduxTest',
+      // },
     ],
   },
 ]
