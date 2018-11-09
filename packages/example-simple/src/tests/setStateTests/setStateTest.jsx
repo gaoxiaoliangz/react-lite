@@ -1,3 +1,5 @@
+import invariant from 'invariant'
+
 export default React => {
   class SetStateTest extends React.Component {
     state = {
@@ -8,23 +10,21 @@ export default React => {
       this.setState({
         clicks,
       })
-      if (clicks === this.state.clicks) {
-        throw new Error('setState should be async!', clicks, this.state.clicks)
-      }
+      invariant(clicks !== this.state.clicks, 'setState should be async!')
     }
 
-    handleMinusClick = () => {
-      this.updateClicks(this.state.clicks - 1)
+    handleAddClick = () => {
+      this.updateClicks(this.state.clicks + 1)
     }
 
     render() {
       const { clicks } = this.state
       return (
         <div>
-          <button onClick={this.handleMinusClick}>-</button>
-          {clicks}
+          clicks: {clicks}
+          <button onClick={this.handleAddClick}>plus 1</button>
           <button onClick={() => this.updateClicks(clicks + 1)}>
-            + (inline func)
+            plus 1 (inline func)
           </button>
         </div>
       )
