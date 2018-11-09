@@ -67,8 +67,6 @@ const patch = (vNode, prevVNode) => {
   if (vNode === prevVNode) {
     return
   }
-  // @todo 是否必要？
-  // vNode.parent = prevVNode.parent
   const { flag, type } = vNode
 
   if (prevVNode.flag !== flag || type !== prevVNode.type) {
