@@ -52,6 +52,9 @@ const patchTextElement = (vNode, prevVNode) => {
     prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
     invariant(prevVNode.dom !== null, 'patchTextElement dom null')
 
+    // 这么做感觉会有 bug，比如有多个空的 textNode
+    // 但不这样会多一个空的 textNode，就和 react 的实现不一样
+    // 等排序实现了之后这里解开在试一遍
     // if (textContent) {
     //   prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
     //   vNode.dom = prevVNode.dom
@@ -102,7 +105,6 @@ export const patchChildren = (currentChildren, lastChildren, parentDOM) => {
       patch(currentVNode, lastChildren[idx])
       lastNodeInUse.push(idx)
     } else {
-      // @todo: reordered
       const match = lastChildren.find(child => child.key === key)
       if (match) {
         lastNodeInUse.push(lastChildren.indexOf(match))
@@ -115,6 +117,11 @@ export const patchChildren = (currentChildren, lastChildren, parentDOM) => {
   lastChildren
     .filter((child, idx) => !lastNodeInUse.includes(idx))
     .forEach(unmount)
+
+  // reorder
+  // _.times(currentChildren.length).forEach(idx => {
+  //   parentDOM.appendChild(currentChildren[idx].dom)
+  // })
 
   return results
 }

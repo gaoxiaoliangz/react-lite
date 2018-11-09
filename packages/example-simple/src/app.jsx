@@ -16,6 +16,7 @@ import setStateWithChildren from './tests/setStateTests/setStateWithChildren'
 import multipleSetStateCalls from './tests/setStateTests/multipleSetStateCalls'
 import callbackAndSetState from './tests/setStateTests/callbackAndSetState'
 import mutateState from './tests/setStateTests/mutateState'
+import reorderTest from './tests/diffTests/reorderTest'
 // import reactReduxTest from './tests/reactReduxTest'
 
 export default (React, { onUpdate }) => {
@@ -37,6 +38,7 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: 'setState tests',
+      disabled: true,
       children: [
         {
           test: setStateTest,
@@ -66,8 +68,12 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: 'diff tests',
-      disabled: true,
+      // disabled: true,
       children: [
+        {
+          test: reorderTest,
+          desc: 'reorder test',
+        },
         {
           test: keyedTest,
           desc: 'keyedTest',
@@ -142,25 +148,27 @@ export default (React, { onUpdate }) => {
     render() {
       return (
         <div className="app">
-          {testGroups.filter(group => !group.disabled).map((group, gIdx) => {
-            return (
-              <div className="group" key={gIdx}>
-                <h2>{group.desc}</h2>
-                {group.children
-                  .filter(child => !child.disabled)
-                  .map((child, idx) => {
-                    const TestComp = child.test(React)
-                    return (
-                      <div key={idx} className="test">
-                        <Section title={child.desc}>
-                          <TestComp />
-                        </Section>
-                      </div>
-                    )
-                  })}
-              </div>
-            )
-          })}
+          {testGroups
+            .filter(group => !group.disabled)
+            .map((group, gIdx) => {
+              return (
+                <div className="group" key={gIdx}>
+                  <h2>{group.desc}</h2>
+                  {group.children
+                    .filter(child => !child.disabled)
+                    .map((child, idx) => {
+                      const TestComp = child.test(React)
+                      return (
+                        <div key={idx} className="test">
+                          <Section title={child.desc}>
+                            <TestComp />
+                          </Section>
+                        </div>
+                      )
+                    })}
+                </div>
+              )
+            })}
         </div>
       )
     }
