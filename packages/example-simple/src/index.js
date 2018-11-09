@@ -6,16 +6,36 @@ import ReactDOM from 'react-dom'
 import app from './app'
 import './style.css'
 import diffRendered from './diffRendered'
+import Controller from './Controller/Controller'
+import parseQuery from './parseQuery'
 
-const mount = ({ domNode, renderFn, react, onUpdate = () => {} }) => {
-  const App = app(react, {
-    render: renderFn,
-    onUpdate,
-  })
+const mount = ({
+  domNode,
+  renderFn,
+  react,
+  onUpdate = () => {},
+  component,
+}) => {
+  const queryObj = parseQuery(window.location.search.substr(1))
+  const App =
+    component ||
+    app(react, {
+      render: renderFn,
+      onUpdate,
+      activeGroup: queryObj.group,
+      activeTest: queryObj.test,
+    })
   renderFn(react.createElement(App), domNode)
 }
 
 const render = () => {
+  mount({
+    domNode: document.getElementById('controller'),
+    renderFn: ReactDOM.render,
+    react: React,
+    component: Controller,
+  })
+
   mount({
     domNode: document.getElementById('root'),
     renderFn: MyReactDOM.render,
@@ -40,7 +60,7 @@ const render = () => {
       setTimeout(() => {
         const diff = diffRendered(
           document.getElementById('root').innerHTML,
-          document.getElementById('root2').innerHTML
+          document.getElementById('root2').innerHTML,
         )
         invariant(!diff, `renders differently!\n${(diff || []).join('\n')}`)
       }, 100)
