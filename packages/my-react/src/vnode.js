@@ -1,10 +1,7 @@
+// @ts-check
 import _ from 'lodash'
 import { getAttrs } from './dom/utils'
-
-const eventMap = {
-  onClick: 'click',
-  onMouseDown: 'mousedown',
-}
+import { eventMap, eventProps } from './dom/event'
 
 export const FLAGS = {
   TEXT: 'text',
@@ -21,17 +18,54 @@ let debugId = 0
 
 class VNode {
   constructor({ type, props = {}, children = [], key, textContent }) {
+    let flag
+    let attributes
+    let finalProps = props
+    let finalListeners
+
     if (type) {
       this.type = type
-      this.props = {
+      finalProps = {
         // 这边的逻辑和 React 的一样
         ..._.omit(props, ['key', 'ref', '__source', '__self']),
         ...(children.length !== 0 && {
           children: children.length === 1 ? children[0] : children,
         }),
       }
+
+      if (typeof type === 'string') {
+        flag = FLAGS.ELEMENT
+        // 因为在每次 render 的时候都会创建新的 vNode，所以写成 getter 没什么意义
+        // 只会使得性能变差
+        const pickedEventProps = _.pick(finalProps, eventProps)
+        if (!_.isEmpty(pickedEventProps)) {
+          finalListeners = _.reduce(
+            pickedEventProps,
+            (listeners, handler, key) => {
+              const match = eventMap[key]
+              return {
+                ...listeners,
+                [match.key]: {
+                  handler,
+                  useCapture: match.useCapture,
+                },
+              }
+            },
+            {}
+          )
+          finalProps = _.omit(finalProps, _.keys(pickedEventProps))
+        }
+        attributes = getAttrs(finalProps)
+      } else if (type.$IS_CLASS) {
+        flag = FLAGS.CLASS
+      } else {
+        flag = FLAGS.FUNC
+      }
       this.ref = props.ref
+    } else {
+      flag = FLAGS.TEXT
     }
+
     this.children = processChildren(children, undefined, this)
 
     // validate keys
@@ -44,19 +78,28 @@ class VNode {
       print(keys)
     }
 
+    this.flag = flag
     this.key = key || props.key
-    this.validated = false
-    this.textContent = textContent
-    this.parent = null
-    this.flag = null
-    this.dom = null
-    this.attributes = null
-    this.instance = null
+    this.props = finalProps
     this._debugId = debugId
-    debugId++
+    this.validated = false
+    this.parent = null
+    this.dom = null
+
     if (typeof type === 'function') {
       this.rendered = null
     }
+    if (flag === FLAGS.CLASS) {
+      this.instance = null
+    }
+    if (flag === FLAGS.TEXT) {
+      this.textContent = textContent
+    }
+    if (flag === FLAGS.ELEMENT) {
+      this.attributes = attributes
+      this.listeners = finalListeners
+    }
+    debugId++
   }
 }
 
@@ -88,31 +131,14 @@ const processChildren = (children, keyPrefix = '__root_', parent) => {
 }
 
 export const createVNode = (type, props, children) => {
-  const node = new VNode({ type, props, children })
-  if (typeof type === 'string') {
-    node.flag = FLAGS.ELEMENT
-    node.attributes = getAttrs(node.props)
-    // 因为在每次 render 的时候都会创建新的 vNode，所以写成 getter 没什么意义
-    // 只会使得性能变差
-    const eventProps = _.pick(node.props, _.keys(eventMap))
-    if (!_.isEmpty(eventProps)) {
-      node.listeners = _.mapKeys(eventProps, (handler, key) => {
-        return eventMap[key]
-      })
-    }
-  } else if (type.$IS_CLASS) {
-    node.flag = FLAGS.CLASS
-  } else {
-    node.flag = FLAGS.FUNC
-  }
-  return node
+  // @ts-ignore
+  return new VNode({ type, props, children })
 }
 
 export const createTextVNode = (text, key) => {
-  const node = new VNode({
+  // @ts-ignore
+  return new VNode({
     textContent: text,
     key,
   })
-  node.flag = FLAGS.TEXT
-  return node
 }
