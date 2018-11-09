@@ -44,19 +44,17 @@ const patchTextElement = (vNode, prevVNode) => {
   // 这个之前居然放到判断里了，导致之前未更新的 text 节点在之后的更新里找不到 dom
   vNode.dom = prevVNode.dom
   if (vNode.textContent !== prevVNode.textContent) {
-    const idx = getNodeIndex(prevVNode.dom)
     const type = typeof vNode.textContent
     const textContent =
       type === 'number' || type === 'string' ? vNode.textContent.toString() : ''
-
-    prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
+    prevVNode.dom.textContent = textContent
     invariant(prevVNode.dom !== null, 'patchTextElement dom null')
 
     // 这么做感觉会有 bug，比如有多个空的 textNode
     // 但不这样会多一个空的 textNode，就和 react 的实现不一样
     // 等排序实现了之后这里解开在试一遍
     // if (textContent) {
-    //   prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
+    //   prevVNode.dom.textContent = textContent
     //   vNode.dom = prevVNode.dom
     // } else {
     //   mount(vNode, prevVNode.dom.parentNode)
@@ -97,31 +95,36 @@ const patch = (vNode, prevVNode) => {
 }
 
 export const patchChildren = (currentChildren, lastChildren, parentDOM) => {
-  const lastNodeInUse = []
+  const lastChildInUse = []
   let results = []
   currentChildren.forEach((currentVNode, idx) => {
     const { key } = currentVNode
     if (lastChildren[idx] && key === lastChildren[idx].key) {
       patch(currentVNode, lastChildren[idx])
-      lastNodeInUse.push(idx)
+      lastChildInUse.push(lastChildren[idx])
     } else {
       const match = lastChildren.find(child => child.key === key)
       if (match) {
-        lastNodeInUse.push(lastChildren.indexOf(match))
+        lastChildInUse.push(match)
         patch(currentVNode, match)
       } else {
         mount(currentVNode, parentDOM)
       }
     }
   })
-  lastChildren
-    .filter((child, idx) => !lastNodeInUse.includes(idx))
-    .forEach(unmount)
+
+  const lastChildNotInUse = lastChildren.filter(
+    child => !lastChildInUse.includes(child)
+  )
 
   // reorder
-  // _.times(currentChildren.length).forEach(idx => {
-  //   parentDOM.appendChild(currentChildren[idx].dom)
-  // })
+  lastChildNotInUse.forEach(unmount)
+  currentChildren.forEach((currentVNode, idx) => {
+    const domIdx = getNodeIndex(currentVNode.dom)
+    if (domIdx !== idx) {
+      parentDOM.insertBefore(currentVNode.dom, parentDOM.childNodes[idx])
+    }
+  })
 
   return results
 }

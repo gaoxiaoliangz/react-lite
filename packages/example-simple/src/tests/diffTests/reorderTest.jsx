@@ -6,7 +6,14 @@ export default React => {
 
     render() {
       const { orderFlag } = this.state
-      const items = [<div className="green" key="0">0</div>, <div key="1">1</div>]
+      const items = [
+        <div className="i0" key="0">
+          0
+        </div>,
+        <div className="i1" key="1">
+          1
+        </div>,
+      ]
       return (
         <div>
           <div>
@@ -20,10 +27,12 @@ export default React => {
               toggle order
             </button>
           </div>
-          {(orderFlag ? [0, 1] : [1, 0]).map(order => {
-            return items[order]
-          })}
-          <div>2</div>
+          <div>
+            {(orderFlag ? [0, 1] : [1, 0]).map(order => {
+              return items[order]
+            })}
+            <div className="i2">2</div>
+          </div>
         </div>
       )
     }

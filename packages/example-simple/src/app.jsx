@@ -72,6 +72,14 @@ export default (React, { onUpdate }) => {
       // disabled: true,
       children: [
         {
+          test: manuallyKeyedTest,
+          desc: 'manuallyKeyedTest',
+        },
+        {
+          test: keyedTest,
+          desc: 'keyedTest',
+        },
+        {
           test: updateAttrs,
           desc: 'update attrs',
         },
@@ -80,20 +88,12 @@ export default (React, { onUpdate }) => {
           desc: 'reorder test',
         },
         {
-          test: keyedTest,
-          desc: 'keyedTest',
-        },
-        {
           test: nestedKeyedTest,
           desc: 'nestedKeyedTest',
         },
         {
-          test: manuallyKeyedTest,
-          desc: 'manuallyKeyedTest',
-        },
-        {
           test: unkeyedTest,
-          desc: 'manuallyKeyedTest',
+          desc: 'unkeyedTest',
         },
         {
           test: reorderTextNodes,
