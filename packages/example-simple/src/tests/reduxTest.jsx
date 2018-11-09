@@ -19,9 +19,8 @@ const reducers = combineReducers({
   },
 })
 
-const store = createStore(reducers)
-
 export default React => {
+  const store = createStore(reducers)
   class ReduxTest extends React.Component {
     componentDidMount() {
       store.subscribe(() => {
