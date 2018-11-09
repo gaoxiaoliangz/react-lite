@@ -47,19 +47,17 @@ const patchTextElement = (vNode, prevVNode) => {
     const type = typeof vNode.textContent
     const textContent =
       type === 'number' || type === 'string' ? vNode.textContent.toString() : ''
-    prevVNode.dom.textContent = textContent
     invariant(prevVNode.dom !== null, 'patchTextElement dom null')
 
-    // 这么做感觉会有 bug，比如有多个空的 textNode
-    // 但不这样会多一个空的 textNode，就和 react 的实现不一样
-    // 等排序实现了之后这里解开在试一遍
-    // if (textContent) {
-    //   prevVNode.dom.textContent = textContent
-    //   vNode.dom = prevVNode.dom
-    // } else {
-    //   mount(vNode, prevVNode.dom.parentNode)
-    //   unmount(prevVNode)
-    // }
+    // 没有真正采用和 react 一样的实现，担心会引入各种 dom 为 null 的问题
+    // 现在在 chrome 里面通过检查器至少看不到 ""
+    if (textContent) {
+      prevVNode.dom.textContent = textContent
+      vNode.dom = prevVNode.dom
+    } else {
+      mount(vNode, prevVNode.dom.parentNode)
+      unmount(prevVNode)
+    }
   }
 }
 
