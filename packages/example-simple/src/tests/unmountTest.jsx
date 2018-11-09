@@ -1,14 +1,28 @@
 export default React => {
-  return class UpdateAttrs extends React.Component {
+  class Comp extends React.Component {
+    componentDidMount() {
+      console.log('mount')
+    }
+
+    componentWillUnmount() {
+      console.log('unmount')
+    }
+
+    render() {
+      return <div>Comp</div>
+    }
+  }
+
+  return class UnmountTest extends React.Component {
     state = {
-      flag: false,
+      flag: true,
     }
 
     render() {
       const { flag } = this.state
       return (
         <div>
-          flag: {flag.toString()}
+          show: {flag.toString()}
           <button
             onClick={() => {
               this.setState({
@@ -18,7 +32,7 @@ export default React => {
           >
             toggle flag
           </button>
-          <div data-test="test" className={flag ? 'green' : 'red'}>text</div>
+          {flag && <Comp />}
         </div>
       )
     }

@@ -8,15 +8,21 @@ import { updateAttrs, getNodeIndex } from './dom/utils'
 import { removeListeners, addListeners } from './dom/event'
 
 const patchClassComponent = (vNode, prevVNode) => {
+  invariant(prevVNode.dom !== null, 'patchClassComponent dom null')
   vNode.instance = prevVNode.instance
+  const oldProps = vNode.instance.props
   vNode.instance.props = vNode.props
   // 因为这个问题排查了很久，一开始表现为 dom 为 null，事件触发两次
   vNode.instance.$context.vNode = vNode
   const newRendered = prevVNode.instance.render()
   vNode.rendered = newRendered
   vNode.dom = prevVNode.dom
-  invariant(prevVNode.dom !== null, 'patchClassComponent dom null')
-  return patch(newRendered, prevVNode.rendered)
+
+  const patchResult = patch(newRendered, prevVNode.rendered)
+  if (vNode.instance.componentDidUpdate) {
+    vNode.instance.componentDidUpdate(oldProps, vNode.instance.state)
+  }
+  return patchResult
 }
 
 const patchFunctionComponent = (vNode, prevVNode) => {

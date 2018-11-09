@@ -18,6 +18,8 @@ import callbackAndSetState from './tests/setStateTests/callbackAndSetState'
 import mutateState from './tests/setStateTests/mutateState'
 import reorderTest from './tests/diffTests/reorderTest'
 import updateAttrs from './tests/diffTests/updateAttrs'
+import unmountTest from './tests/unmountTest'
+import didUpdateTest from './tests/didUpdateTest'
 // import reactReduxTest from './tests/reactReduxTest'
 
 export default (React, { onUpdate }) => {
@@ -69,7 +71,7 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: 'diff tests',
-      // disabled: true,
+      disabled: true,
       children: [
         {
           test: manuallyKeyedTest,
@@ -107,11 +109,19 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: 'lifecycle tests',
-      disabled: true,
+      // disabled: true,
       children: [
         {
           test: lifecycleTest,
           desc: 'lifecycleTest',
+        },
+        {
+          test: unmountTest,
+          desc: 'unmount test',
+        },
+        {
+          test: didUpdateTest,
+          desc: 'didUpdateTest',
         },
       ],
     },

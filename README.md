@@ -20,8 +20,9 @@ Function component
 Class component
 
 - setState
-- lifecycle methods: componentDidMount
-- todo: more lifecycle methods
+- componentDidMount
+- componentDidUpdate
+- componentWillUnmount
 
 ReactDOM
 
