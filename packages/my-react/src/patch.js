@@ -30,10 +30,10 @@ const patchFunctionComponent = (vNode, prevVNode) => {
 }
 
 const patchElement = (vNode, prevVNode) => {
+  vNode.dom = prevVNode.dom
   if (!_.isEqual(vNode.attributes, prevVNode.attributes)) {
     updateAttrs(vNode.dom, vNode.attributes)
   }
-  vNode.dom = prevVNode.dom
   invariant(prevVNode.dom !== null, 'patchElement dom null')
   removeListeners(prevVNode.dom, prevVNode.listeners)
   addListeners(vNode.dom, vNode.listeners)

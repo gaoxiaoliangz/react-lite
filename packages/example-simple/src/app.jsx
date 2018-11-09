@@ -17,6 +17,7 @@ import multipleSetStateCalls from './tests/setStateTests/multipleSetStateCalls'
 import callbackAndSetState from './tests/setStateTests/callbackAndSetState'
 import mutateState from './tests/setStateTests/mutateState'
 import reorderTest from './tests/diffTests/reorderTest'
+import updateAttrs from './tests/diffTests/updateAttrs'
 // import reactReduxTest from './tests/reactReduxTest'
 
 export default (React, { onUpdate }) => {
@@ -70,6 +71,10 @@ export default (React, { onUpdate }) => {
       desc: 'diff tests',
       // disabled: true,
       children: [
+        {
+          test: updateAttrs,
+          desc: 'update attrs',
+        },
         {
           test: reorderTest,
           desc: 'reorder test',
