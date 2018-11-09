@@ -58,24 +58,6 @@ class VNode {
       this.rendered = null
     }
   }
-
-  // render() {
-  //   if (this.flag === FLAGS.FUNC) {
-  //   } else if (this.flag === FLAGS.CLASS) {
-
-
-  //     vNode.instance = prevVNode.instance
-  //     vNode.instance.props = vNode.props
-  //     // 因为这个问题排查了很久，一开始表现为 dom 为 null，事件触发两次
-  //     vNode.instance.$context.vNode = vNode
-  //     const newRendered = prevVNode.instance.render()
-  //     vNode.rendered = newRendered
-  //     vNode.dom = prevVNode.dom
-
-  //   } else {
-  //     throw new Error('Only can be called on func or class')
-  //   }
-  // }
 }
 
 // generate unique keys & flatten children
