@@ -44,7 +44,7 @@ class VNode {
       print(keys)
     }
 
-    this.key = key
+    this.key = key || props.key
     this.validated = false
     this.textContent = textContent
     this.parent = null
