@@ -20,11 +20,21 @@ import reorderTest from './tests/diffTests/reorderTest'
 import updateAttrs from './tests/diffTests/updateAttrs'
 import unmountTest from './tests/unmountTest'
 import didUpdateTest from './tests/didUpdateTest'
+import inputTest from './tests/form/inputTest'
 // import reactReduxTest from './tests/reactReduxTest'
 
 export default (React, { onUpdate }) => {
   const Section = section(React)
   const testGroups = [
+    {
+      desc: 'form tests',
+      children: [
+        {
+          test: inputTest,
+          desc: 'input test',
+        },
+      ],
+    },
     {
       desc: 'render tests',
       disabled: true,
@@ -109,7 +119,7 @@ export default (React, { onUpdate }) => {
     },
     {
       desc: 'lifecycle tests',
-      // disabled: true,
+      disabled: true,
       children: [
         {
           test: lifecycleTest,

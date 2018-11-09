@@ -11,7 +11,6 @@ The package is at very early stages of development, so only a handful of react f
 React
 
 - createElement
-- todo: cloneElement
 
 Function component
 
