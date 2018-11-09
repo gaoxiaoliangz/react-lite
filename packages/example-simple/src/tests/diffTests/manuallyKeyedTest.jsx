@@ -39,6 +39,7 @@ export default React => {
               return (
                 <li
                   key={n}
+                  className={`i-${n}`}
                   ref={ref => {
                     if (n === 1) {
                       this.item = ref

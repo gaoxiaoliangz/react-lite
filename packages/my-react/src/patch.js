@@ -8,15 +8,21 @@ import { updateAttrs, getNodeIndex } from './dom/utils'
 import { removeListeners, addListeners } from './dom/event'
 
 const patchClassComponent = (vNode, prevVNode) => {
+  invariant(prevVNode.dom !== null, 'patchClassComponent dom null')
   vNode.instance = prevVNode.instance
+  const oldProps = vNode.instance.props
   vNode.instance.props = vNode.props
   // 因为这个问题排查了很久，一开始表现为 dom 为 null，事件触发两次
   vNode.instance.$context.vNode = vNode
   const newRendered = prevVNode.instance.render()
   vNode.rendered = newRendered
   vNode.dom = prevVNode.dom
-  invariant(prevVNode.dom !== null, 'patchClassComponent dom null')
-  return patch(newRendered, prevVNode.rendered)
+
+  const patchResult = patch(newRendered, prevVNode.rendered)
+  if (vNode.instance.componentDidUpdate) {
+    vNode.instance.componentDidUpdate(oldProps, vNode.instance.state)
+  }
+  return patchResult
 }
 
 const patchFunctionComponent = (vNode, prevVNode) => {
@@ -30,10 +36,10 @@ const patchFunctionComponent = (vNode, prevVNode) => {
 }
 
 const patchElement = (vNode, prevVNode) => {
+  vNode.dom = prevVNode.dom
   if (!_.isEqual(vNode.attributes, prevVNode.attributes)) {
     updateAttrs(vNode.dom, vNode.attributes)
   }
-  vNode.dom = prevVNode.dom
   invariant(prevVNode.dom !== null, 'patchElement dom null')
   removeListeners(prevVNode.dom, prevVNode.listeners)
   addListeners(vNode.dom, vNode.listeners)
@@ -44,21 +50,20 @@ const patchTextElement = (vNode, prevVNode) => {
   // 这个之前居然放到判断里了，导致之前未更新的 text 节点在之后的更新里找不到 dom
   vNode.dom = prevVNode.dom
   if (vNode.textContent !== prevVNode.textContent) {
-    const idx = getNodeIndex(prevVNode.dom)
     const type = typeof vNode.textContent
     const textContent =
       type === 'number' || type === 'string' ? vNode.textContent.toString() : ''
-
-    prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
     invariant(prevVNode.dom !== null, 'patchTextElement dom null')
 
-    // if (textContent) {
-    //   prevVNode.dom.parentNode.childNodes[idx].textContent = textContent
-    //   vNode.dom = prevVNode.dom
-    // } else {
-    //   mount(vNode, prevVNode.dom.parentNode)
-    //   unmount(prevVNode)
-    // }
+    // 没有真正采用和 react 一样的实现，担心会引入各种 dom 为 null 的问题
+    // 现在在 chrome 里面通过检查器至少看不到 ""
+    if (textContent) {
+      prevVNode.dom.textContent = textContent
+      vNode.dom = prevVNode.dom
+    } else {
+      mount(vNode, prevVNode.dom.parentNode)
+      unmount(prevVNode)
+    }
   }
 }
 
@@ -66,8 +71,6 @@ const patch = (vNode, prevVNode) => {
   if (vNode === prevVNode) {
     return
   }
-  // @todo 是否必要？
-  // vNode.parent = prevVNode.parent
   const { flag, type } = vNode
 
   if (prevVNode.flag !== flag || type !== prevVNode.type) {
@@ -94,27 +97,36 @@ const patch = (vNode, prevVNode) => {
 }
 
 export const patchChildren = (currentChildren, lastChildren, parentDOM) => {
-  const lastNodeInUse = []
+  const lastChildInUse = []
   let results = []
   currentChildren.forEach((currentVNode, idx) => {
     const { key } = currentVNode
     if (lastChildren[idx] && key === lastChildren[idx].key) {
       patch(currentVNode, lastChildren[idx])
-      lastNodeInUse.push(idx)
+      lastChildInUse.push(lastChildren[idx])
     } else {
-      // @todo: reordered
       const match = lastChildren.find(child => child.key === key)
       if (match) {
-        lastNodeInUse.push(lastChildren.indexOf(match))
+        lastChildInUse.push(match)
         patch(currentVNode, match)
       } else {
         mount(currentVNode, parentDOM)
       }
     }
   })
-  lastChildren
-    .filter((child, idx) => !lastNodeInUse.includes(idx))
-    .forEach(unmount)
+
+  const lastChildNotInUse = lastChildren.filter(
+    child => !lastChildInUse.includes(child)
+  )
+
+  // reorder
+  lastChildNotInUse.forEach(unmount)
+  currentChildren.forEach((currentVNode, idx) => {
+    const domIdx = getNodeIndex(currentVNode.dom)
+    if (domIdx !== idx) {
+      parentDOM.insertBefore(currentVNode.dom, parentDOM.childNodes[idx])
+    }
+  })
 
   return results
 }

@@ -1,6 +1,5 @@
 import { Provider, connect } from 'react-redux'
 import { createStore, combineReducers } from 'redux'
-import section from '../section'
 
 const updateCount = count => {
   return {
@@ -21,20 +20,18 @@ const reducers = combineReducers({
   },
 })
 
-const store = createStore(reducers)
-
 export default React => {
-  const Section = section(React)
+  const store = createStore(reducers)
 
   const ReactReduxTest = ({ count, updateCount }) => {
     return (
-      <Section title="react-redux test">
+      <div>
         <div>
           <button onClick={() => updateCount(count - 1)}>-</button>
           {count}
           <button onClick={() => updateCount(count + 1)}>+</button>
         </div>
-      </Section>
+      </div>
     )
   }
 
@@ -44,7 +41,7 @@ export default React => {
         count: state.count,
       }
     },
-    { updateCount }
+    { updateCount },
   )(ReactReduxTest)
 
   class ReactReduxTestWrapper extends React.Component {

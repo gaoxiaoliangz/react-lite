@@ -1,3 +1,4 @@
+// @ts-check
 import invariant from 'invariant'
 import { FLAGS } from '../vnode'
 import { updateAttrs } from './utils'
@@ -25,17 +26,12 @@ const createDOMTextElement = vNode => {
   return dom
 }
 
-const mountChild = (child, parent, prevSibling) => {
-  // if (prevSibling) {
-  // } else {
-  //   parent.appendChild(child)
-  // }
-  // parent.insertBefore(child, prevSibling.nextSibling || parent.childNodes[0])
+const mountChild = (child, parent) => {
   parent.appendChild(child)
 }
 
 // mount
-const mountClassComponent = (vNode, parentDOM, prevSibling) => {
+const mountClassComponent = (vNode, parentDOM) => {
   const instance = new vNode.type(vNode.props, {
     vNode,
   })
@@ -45,7 +41,7 @@ const mountClassComponent = (vNode, parentDOM, prevSibling) => {
   instance.$context = {
     vNode,
   }
-  const dom = mount(rendered, parentDOM, prevSibling)
+  const dom = mount(rendered, parentDOM)
   if (instance.componentDidMount) {
     instance.componentDidMount()
   }
@@ -53,44 +49,44 @@ const mountClassComponent = (vNode, parentDOM, prevSibling) => {
   return dom
 }
 
-const mountFunctionComponent = (vNode, parentDOM, prevSibling) => {
+const mountFunctionComponent = (vNode, parentDOM) => {
   const rendered = vNode.type(vNode.props)
   vNode.rendered = rendered
-  const dom = mount(rendered, parentDOM, prevSibling)
+  const dom = mount(rendered, parentDOM)
   vNode.dom = dom
   return dom
 }
 
-const mountText = (vNode, parentDOM, prevSibling) => {
-  const textNode = createDOMTextElement(vNode, parentDOM)
-  mountChild(textNode, parentDOM, prevSibling)
+const mountText = (vNode, parentDOM) => {
+  const textNode = createDOMTextElement(vNode)
+  mountChild(textNode, parentDOM)
   vNode.dom = textNode
   return textNode
 }
 
-const mountElement = (vNode, parentDOM, prevSibling) => {
+const mountElement = (vNode, parentDOM) => {
   const dom = createDOMElement(vNode)
-  mountChild(dom, parentDOM, prevSibling)
+  mountChild(dom, parentDOM)
   vNode.dom = dom
   return dom
 }
 
-const mount = (vNode, parentDOM, prevSibling) => {
+const mount = (vNode, parentDOM) => {
   const { flag } = vNode
   let dom
 
   switch (flag) {
     case FLAGS.CLASS:
-      dom = mountClassComponent(vNode, parentDOM, prevSibling)
+      dom = mountClassComponent(vNode, parentDOM)
       break
     case FLAGS.FUNC:
-      dom = mountFunctionComponent(vNode, parentDOM, prevSibling)
+      dom = mountFunctionComponent(vNode, parentDOM)
       break
     case FLAGS.ELEMENT:
-      dom = mountElement(vNode, parentDOM, prevSibling)
+      dom = mountElement(vNode, parentDOM)
       break
     case FLAGS.TEXT:
-      dom = mountText(vNode, parentDOM, prevSibling)
+      dom = mountText(vNode, parentDOM)
       break
     default:
       throw new Error(`Unknown flag ${flag}`)

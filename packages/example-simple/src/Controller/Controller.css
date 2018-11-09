@@ -1,0 +1,12 @@
+.controller {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  padding: 30px;
+  z-index: 999;
+}
+
+.controller select {
+  display: inline-block;
+  margin: 0 15px 0 5px;
+}

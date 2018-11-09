@@ -1,6 +1,10 @@
-const unmount = (vNode) => {
+import { FLAGS } from '../vnode'
+
+const unmount = vNode => {
+  if (vNode.flag === FLAGS.CLASS && vNode.instance.componentWillUnmount) {
+    vNode.instance.componentWillUnmount()
+  }
   vNode.dom.parentNode.removeChild(vNode.dom)
-  // @todo lifecycle
 }
 
 export default unmount
