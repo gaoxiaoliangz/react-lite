@@ -23,9 +23,9 @@ class VNode {
    * @param {{ type?, props?, textContent?, key?, flag }} config
    */
   constructor({ type, props, key, textContent, flag }) {
+    this._debugId = debugId
     this.type = type
     this.flag = flag
-    this._debugId = debugId
     this.props = props
     this.textContent = textContent
     this.key = key
@@ -38,6 +38,7 @@ class VNode {
     this.attributes = null
     this.rendered = null
     this.instance = null
+    this.state = null
   }
 }
 
