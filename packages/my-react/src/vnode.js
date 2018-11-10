@@ -83,6 +83,11 @@ export const createVNode = (type, allProps = {}) => {
     vNode = createClassVNode(type, props)
   } else if (typeof type === 'function') {
     vNode = createFunctionVNode(type, props)
+    if (allProps.ref) {
+      console.error(
+        'Function components cannot be given refs. Attempts to access this ref will fail.',
+      )
+    }
   } else if (type === TEXT_VNODE_TYPE) {
     vNode = createTextVNode(props.textContent)
   } else {

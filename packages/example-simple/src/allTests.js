@@ -21,6 +21,7 @@ import unmountTest from './tests/unmountTest'
 import didUpdateTest from './tests/didUpdateTest'
 import inputTest from './tests/form/inputTest'
 import keyTest from './tests/keyTest'
+import refTest from './tests/refTests/refTest'
 // import reactReduxTest from './tests/reactReduxTest'
 
 const testGroups = [
@@ -47,6 +48,15 @@ const testGroups = [
       {
         test: keyTest,
         desc: 'key test',
+      },
+    ],
+  },
+  {
+    desc: 'ref tests',
+    children: [
+      {
+        test: refTest,
+        desc: 'ref test',
       },
     ],
   },

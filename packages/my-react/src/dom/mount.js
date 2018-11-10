@@ -12,9 +12,6 @@ const createDOMElement = vNode => {
   vNode.children.forEach(child => {
     mount(child, dom)
   })
-  if (ref) {
-    ref(dom)
-  }
   return dom
 }
 
@@ -42,10 +39,14 @@ const mountClassComponent = (vNode, parentDOM) => {
     vNode,
   }
   const dom = mount(rendered, parentDOM)
+  vNode.dom = dom
   if (instance.componentDidMount) {
     instance.componentDidMount()
   }
-  vNode.dom = dom
+  // @todo: 这里处理 ref 的时机和 react 并不一样，不知道 react 是出于什么考虑
+  if (vNode.ref) {
+    vNode.ref(instance)
+  }
   return dom
 }
 
@@ -67,6 +68,9 @@ const mountText = (vNode, parentDOM) => {
 const mountElement = (vNode, parentDOM) => {
   const dom = createDOMElement(vNode)
   mountChild(dom, parentDOM)
+  if (vNode.ref) {
+    vNode.ref(dom)
+  }
   vNode.dom = dom
   return dom
 }

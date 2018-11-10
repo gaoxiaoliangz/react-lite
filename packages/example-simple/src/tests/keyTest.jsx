@@ -1,27 +1,22 @@
 import _ from 'lodash'
 
 export default React => {
-  // const Item = props => {
-  //   console.log(props)
-  //   return <div>item {props.label}</div>
-  // }
-
-  class Item2 extends React.Component {
-    render() {
-      console.log(this.props)
-      return <div>item {this.props.label}</div>
-    }
+  const Item = props => {
+    return <div>item {props.label}</div>
   }
+
+  // class Item extends React.Component {
+  //   render() {
+  //     return <div>item {this.props.label}</div>
+  //   }
+  // }
 
   const KeyTest = () => {
     return (
       <div>
         {_.times(3, n => {
           return (
-            <Item2
-              ref={ref => {
-                console.log('item2 ref', ref)
-              }}
+            <Item
               key={n}
               label={n}
             />
