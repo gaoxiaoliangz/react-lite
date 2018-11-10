@@ -8,7 +8,7 @@ export function getAttrs(props) {
         return 'class'
       }
       return k
-    })
+    }),
   )(props)
 }
 
