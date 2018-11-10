@@ -1,9 +1,8 @@
 import patch from './patch'
 
 export default class Component {
-  constructor(props, context) {
+  constructor(props) {
     this.props = props
-    this.$context = context
     this.state = null
   }
 
@@ -16,8 +15,8 @@ export default class Component {
         ...state,
       }
       const rendered = this.render()
-      patch(rendered, this.$context.vNode.rendered)
-      this.$context.vNode.rendered = rendered
+      patch(rendered, this._vNode.rendered)
+      this._vNode.rendered = rendered
       if (cb) cb()
       if (this.componentDidUpdate) {
         this.componentDidUpdate(prevProps, prevState)

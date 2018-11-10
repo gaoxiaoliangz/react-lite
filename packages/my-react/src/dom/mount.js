@@ -29,15 +29,11 @@ const mountChild = (child, parent) => {
 
 // mount
 const mountClassComponent = (vNode, parentDOM) => {
-  const instance = new vNode.type(vNode.props, {
-    vNode,
-  })
+  const instance = new vNode.type(vNode.props)
   vNode.instance = instance
+  instance._vNode = vNode
   const rendered = instance.render()
   vNode.rendered = rendered
-  instance.$context = {
-    vNode,
-  }
   const dom = mount(rendered, parentDOM)
   vNode.dom = dom
   if (instance.componentDidMount) {

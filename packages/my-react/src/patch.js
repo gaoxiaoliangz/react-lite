@@ -13,7 +13,7 @@ const patchClassComponent = (vNode, prevVNode) => {
   const oldProps = vNode.instance.props
   vNode.instance.props = vNode.props
   // 因为这个问题排查了很久，一开始表现为 dom 为 null，事件触发两次
-  vNode.instance.$context.vNode = vNode
+  vNode.instance._vNode = vNode
   const newRendered = prevVNode.instance.render()
   vNode.rendered = newRendered
   vNode.dom = prevVNode.dom
