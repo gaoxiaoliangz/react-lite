@@ -6,6 +6,7 @@ import mount from './dom/mount'
 import unmount from './dom/unmount'
 import { updateAttrs, getNodeIndex } from './dom/utils'
 import { removeListeners, addListeners } from './dom/event'
+import { reactState, funcStates } from './hooks'
 
 const patchClassComponent = (vNode, prevVNode) => {
   invariant(prevVNode.dom !== null, 'patchClassComponent dom null')
@@ -30,6 +31,15 @@ const patchClassComponent = (vNode, prevVNode) => {
 }
 
 const patchFunctionComponent = (vNode, prevVNode) => {
+  const prevStore = funcStates.get(prevVNode)
+  if (prevStore) {
+    // reset cursor before rendering
+    prevStore.cursor = -1
+    funcStates.set(vNode, prevStore)
+    funcStates.delete(prevVNode)
+  }
+  reactState.currentVNode = vNode
+  reactState.isCreatingState = false
   const newRendered = vNode.type(vNode.props)
   // 需要手动更新 rendered
   // 其实可以写成 vNode.render() 然后自己更新内部状态，但那样太 OO 了

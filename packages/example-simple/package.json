@@ -8,8 +8,8 @@
     "inferno-compat": "^6.1.4",
     "lodash": "^4.17.4",
     "my-react": "^0.6.0",
-    "react": "^16.6.0",
-    "react-dom": "^16.6.0",
+    "react": "16.7.0-alpha.0",
+    "react-dom": "16.7.0-alpha.0",
     "react-redux": "^5.1.0",
     "redux": "^4.0.1"
   },

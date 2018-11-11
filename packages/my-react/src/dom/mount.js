@@ -3,6 +3,7 @@ import invariant from 'invariant'
 import { FLAGS } from '../vnode'
 import { updateAttrs } from './utils'
 import { addListeners } from './event'
+import { reactState, funcStates } from '../hooks';
 
 const createDOMElement = vNode => {
   const { ref } = vNode
@@ -47,7 +48,13 @@ const mountClassComponent = (vNode, parentDOM) => {
 }
 
 const mountFunctionComponent = (vNode, parentDOM) => {
+  reactState.currentVNode = vNode
+  reactState.isCreatingState = true
   const rendered = vNode.type(vNode.props)
+  // reset cursor if function component uses hooks
+  if (funcStates.get(vNode)) {
+    funcStates.get(vNode).cursor = -1
+  }
   vNode.rendered = rendered
   const dom = mount(rendered, parentDOM)
   vNode.dom = dom
