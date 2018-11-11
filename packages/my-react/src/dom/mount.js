@@ -3,6 +3,7 @@ import invariant from 'invariant'
 import { FLAGS } from '../vnode'
 import { updateAttrs } from './utils'
 import { addListeners } from './event'
+import { reactState, funcStates } from '../hooks';
 
 const createDOMElement = vNode => {
   const { ref } = vNode
@@ -12,9 +13,6 @@ const createDOMElement = vNode => {
   vNode.children.forEach(child => {
     mount(child, dom)
   })
-  if (ref) {
-    ref(dom)
-  }
   return dom
 }
 
@@ -32,25 +30,31 @@ const mountChild = (child, parent) => {
 
 // mount
 const mountClassComponent = (vNode, parentDOM) => {
-  const instance = new vNode.type(vNode.props, {
-    vNode,
-  })
+  const instance = new vNode.type(vNode.props)
   vNode.instance = instance
+  instance._vNode = vNode
   const rendered = instance.render()
   vNode.rendered = rendered
-  instance.$context = {
-    vNode,
-  }
   const dom = mount(rendered, parentDOM)
+  vNode.dom = dom
   if (instance.componentDidMount) {
     instance.componentDidMount()
   }
-  vNode.dom = dom
+  // @todo: 这里处理 ref 的时机和 react 并不一样，不知道 react 是出于什么考虑
+  if (vNode.ref) {
+    vNode.ref(instance)
+  }
   return dom
 }
 
 const mountFunctionComponent = (vNode, parentDOM) => {
+  reactState.currentVNode = vNode
+  reactState.isCreatingState = true
   const rendered = vNode.type(vNode.props)
+  // reset cursor if function component uses hooks
+  if (funcStates.get(vNode)) {
+    funcStates.get(vNode).cursor = -1
+  }
   vNode.rendered = rendered
   const dom = mount(rendered, parentDOM)
   vNode.dom = dom
@@ -67,6 +71,9 @@ const mountText = (vNode, parentDOM) => {
 const mountElement = (vNode, parentDOM) => {
   const dom = createDOMElement(vNode)
   mountChild(dom, parentDOM)
+  if (vNode.ref) {
+    vNode.ref(dom)
+  }
   vNode.dom = dom
   return dom
 }

@@ -10,7 +10,7 @@ export const removeListeners = (dom, listeners = {}) => {
   })
 }
 
-export const eventProps = [
+export const REACT_EVENT_KEYS = [
   // Clipboard Events
   'onCopy',
   'onCopyCapture',
@@ -203,7 +203,7 @@ const reactEventMap = {
   doubleclick: 'dblclick',
 }
 
-export const eventMap = eventProps.reduce((map, key) => {
+export const REACT_EVENT_MAP = REACT_EVENT_KEYS.reduce((map, key) => {
   const useCapture = key.endsWith('Capture')
   const domEventKey = key
     .substring(2, !useCapture ? key.length : key.length - 7)

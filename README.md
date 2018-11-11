@@ -14,7 +14,7 @@ React
 
 Function component
 
-- todo: support hooks
+- hooks: useState
 
 Class component
 

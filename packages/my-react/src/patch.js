@@ -6,6 +6,7 @@ import mount from './dom/mount'
 import unmount from './dom/unmount'
 import { updateAttrs, getNodeIndex } from './dom/utils'
 import { removeListeners, addListeners } from './dom/event'
+import { reactState, funcStates } from './hooks'
 
 const patchClassComponent = (vNode, prevVNode) => {
   invariant(prevVNode.dom !== null, 'patchClassComponent dom null')
@@ -13,7 +14,7 @@ const patchClassComponent = (vNode, prevVNode) => {
   const oldProps = vNode.instance.props
   vNode.instance.props = vNode.props
   // 因为这个问题排查了很久，一开始表现为 dom 为 null，事件触发两次
-  vNode.instance.$context.vNode = vNode
+  vNode.instance._vNode = vNode
   const newRendered = prevVNode.instance.render()
   vNode.rendered = newRendered
   vNode.dom = prevVNode.dom
@@ -22,10 +23,23 @@ const patchClassComponent = (vNode, prevVNode) => {
   if (vNode.instance.componentDidUpdate) {
     vNode.instance.componentDidUpdate(oldProps, vNode.instance.state)
   }
+  // @todo: react 里面，在 update 阶段，一开始 ref 会是 null
+  if (vNode.ref) {
+    vNode.ref(vNode.instance)
+  }
   return patchResult
 }
 
 const patchFunctionComponent = (vNode, prevVNode) => {
+  const prevStore = funcStates.get(prevVNode)
+  if (prevStore) {
+    // reset cursor before rendering
+    prevStore.cursor = -1
+    funcStates.set(vNode, prevStore)
+    funcStates.delete(prevVNode)
+  }
+  reactState.currentVNode = vNode
+  reactState.isCreatingState = false
   const newRendered = vNode.type(vNode.props)
   // 需要手动更新 rendered
   // 其实可以写成 vNode.render() 然后自己更新内部状态，但那样太 OO 了
@@ -44,6 +58,9 @@ const patchElement = (vNode, prevVNode) => {
   removeListeners(prevVNode.dom, prevVNode.listeners)
   addListeners(vNode.dom, vNode.listeners)
   patchChildren(vNode.children, prevVNode.children, prevVNode.dom)
+  if (vNode.ref) {
+    vNode.ref(vNode.dom)
+  }
 }
 
 const patchTextElement = (vNode, prevVNode) => {
@@ -116,7 +133,7 @@ export const patchChildren = (currentChildren, lastChildren, parentDOM) => {
   })
 
   const lastChildNotInUse = lastChildren.filter(
-    child => !lastChildInUse.includes(child)
+    child => !lastChildInUse.includes(child),
   )
 
   // reorder

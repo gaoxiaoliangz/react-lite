@@ -20,6 +20,11 @@ import updateAttrs from './tests/diffTests/updateAttrs'
 import unmountTest from './tests/unmountTest'
 import didUpdateTest from './tests/didUpdateTest'
 import inputTest from './tests/form/inputTest'
+import keyTest from './tests/keyTest'
+import refTest from './tests/refTests/refTest'
+import useStateTest from './tests/hooksTests/useStateTest'
+import useStateTest2 from './tests/hooksTests/useStateTest2'
+import useStateTest3 from './tests/hooksTests/useStateTest3'
 // import reactReduxTest from './tests/reactReduxTest'
 
 const testGroups = [
@@ -42,6 +47,36 @@ const testGroups = [
       {
         test: childrenTest,
         desc: 'children test',
+      },
+      {
+        test: keyTest,
+        desc: 'key test',
+      },
+    ],
+  },
+  {
+    desc: 'hook tests',
+    children: [
+      {
+        test: useStateTest,
+        desc: 'useState test',
+      },
+      {
+        test: useStateTest2,
+        desc: 'useState test2',
+      },
+      {
+        test: useStateTest3,
+        desc: 'useState test3',
+      },
+    ],
+  },
+  {
+    desc: 'ref tests',
+    children: [
+      {
+        test: refTest,
+        desc: 'ref test',
       },
     ],
   },

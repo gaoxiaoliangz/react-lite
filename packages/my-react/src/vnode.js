@@ -1,7 +1,7 @@
 // @ts-check
 import _ from 'lodash'
 import { getAttrs } from './dom/utils'
-import { eventMap, eventProps } from './dom/event'
+import { REACT_EVENT_MAP, REACT_EVENT_KEYS } from './dom/event'
 
 export const FLAGS = {
   TEXT: 'text',
@@ -10,6 +10,8 @@ export const FLAGS = {
   ELEMENT: 'element',
 }
 
+const TEXT_VNODE_TYPE = Symbol('text_vnode_type')
+
 const isTextElement = element => {
   return !(element instanceof VNode)
 }
@@ -17,128 +19,182 @@ const isTextElement = element => {
 let debugId = 0
 
 class VNode {
-  constructor({ type, props = {}, children = [], key, textContent }) {
-    let flag
-    let attributes
-    let finalProps = props
-    let finalListeners
-
-    if (type) {
-      this.type = type
-      finalProps = {
-        // 这边的逻辑和 React 的一样
-        ..._.omit(props, ['key', 'ref', '__source', '__self']),
-        ...(children.length !== 0 && {
-          children: children.length === 1 ? children[0] : children,
-        }),
-      }
-
-      if (typeof type === 'string') {
-        flag = FLAGS.ELEMENT
-        // 因为在每次 render 的时候都会创建新的 vNode，所以写成 getter 没什么意义
-        // 只会使得性能变差
-        const pickedEventProps = _.pick(finalProps, eventProps)
-        if (!_.isEmpty(pickedEventProps)) {
-          finalListeners = _.reduce(
-            pickedEventProps,
-            (listeners, handler, key) => {
-              const match = eventMap[key]
-              return {
-                ...listeners,
-                [match.key]: {
-                  handler,
-                  useCapture: match.useCapture,
-                },
-              }
-            },
-            {}
-          )
-          finalProps = _.omit(finalProps, _.keys(pickedEventProps))
-        }
-        attributes = getAttrs(finalProps)
-      } else if (type.$IS_CLASS) {
-        flag = FLAGS.CLASS
-      } else {
-        flag = FLAGS.FUNC
-      }
-      this.ref = props.ref
-    } else {
-      flag = FLAGS.TEXT
-    }
-
-    this.children = processChildren(children, undefined, this)
-
-    // validate keys
-    const keys = this.children.map(child => child.key)
-    const uniqueKeys = _.union(keys)
-    const print = arr => console.log(arr.sort().join(', '))
-    if (keys.length !== uniqueKeys.length) {
-      console.error('key should be unique!')
-      print(uniqueKeys)
-      print(keys)
-    }
-
-    this.flag = flag
-    this.key = key || props.key
-    this.props = finalProps
+  /**
+   * @param {{ type?, props?, textContent?, key?, flag }} config
+   */
+  constructor({ type, props, key, textContent, flag }) {
     this._debugId = debugId
+    this.type = type
+    this.flag = flag
+    this.props = props
+    this.textContent = textContent
+    this.key = key
+    this.children = []
+    this.ref = null
     this.validated = false
     this.parent = null
     this.dom = null
-
-    if (typeof type === 'function') {
-      this.rendered = null
-    }
-    if (flag === FLAGS.CLASS) {
-      this.instance = null
-    }
-    if (flag === FLAGS.TEXT) {
-      this.textContent = textContent
-    }
-    if (flag === FLAGS.ELEMENT) {
-      this.attributes = attributes
-      this.listeners = finalListeners
-    }
-    debugId++
+    this.listeners = null
+    this.attributes = null
+    this.rendered = null
+    this.instance = null
+    this.state = null
   }
 }
 
 // generate unique keys & flatten children
 const processChildren = (children, keyPrefix = '__root_', parent) => {
-  return children.reduce((output, childElement, idx) => {
-    if (Array.isArray(childElement)) {
-      return output.concat(
-        processChildren(childElement, `${keyPrefix}${idx}_>`, parent)
+  return (Array.isArray(children) ? children : [children]).reduce(
+    (output, childElement, idx) => {
+      if (Array.isArray(childElement)) {
+        return output.concat(
+          processChildren(childElement, `${keyPrefix}${idx}_>`, parent),
+        )
+      }
+
+      const generatedKey = '__gen_' + keyPrefix + idx
+
+      if (isTextElement(childElement)) {
+        const textVNode = createVNode(TEXT_VNODE_TYPE, {
+          textContent: childElement,
+          key: generatedKey,
+        })
+        textVNode.parent = parent
+        return [...output, textVNode]
+      }
+
+      childElement.parent = parent
+      if (childElement.key === null) {
+        childElement.key = generatedKey
+      } else {
+        childElement.key = keyPrefix + childElement.key
+      }
+      return [...output, childElement]
+    },
+    [],
+  )
+}
+
+export const createVNode = (type, allProps = {}) => {
+  let vNode
+  const props = _.omit(allProps, ['key', 'ref', '__source', '__self'])
+  if (typeof type === 'string') {
+    vNode = createElementVNode(type, props)
+  } else if (type.$IS_CLASS) {
+    vNode = createClassVNode(type, props)
+  } else if (typeof type === 'function') {
+    vNode = createFunctionVNode(type, props)
+    if (allProps.ref) {
+      console.error(
+        'Function components cannot be given refs. Attempts to access this ref will fail.',
       )
     }
+  } else if (type === TEXT_VNODE_TYPE) {
+    vNode = createTextVNode(props.textContent)
+  } else {
+    throw new Error(`Unknown type: ${type}`)
+  }
+  vNode.key = allProps.key === undefined ? null : allProps.key
+  vNode.ref = allProps.ref || null
 
-    const generatedKey = '__gen_' + keyPrefix + idx
+  if (vNode.key !== null) {
+    Object.defineProperty(props, 'key', {
+      configurable: false,
+      enumerable: false,
+      get() {
+        console.error(
+          '`key` is not a prop. Trying to access it will result in `undefined` being returned',
+        )
+      },
+    })
+  }
 
-    if (isTextElement(childElement)) {
-      const textVNode = createTextVNode(childElement, generatedKey)
-      textVNode.parent = parent
-      return [...output, textVNode]
-    }
+  if (vNode.ref !== null) {
+    Object.defineProperty(props, 'ref', {
+      configurable: false,
+      enumerable: false,
+      get() {
+        console.error(
+          '`ref` is not a prop. Trying to access it will result in `undefined` being returned',
+        )
+      },
+    })
+  }
 
-    childElement.parent = parent
-    if (childElement.key === undefined) {
-      childElement.key = generatedKey
-    } else {
-      childElement.key = keyPrefix + childElement.key
-    }
-    return [...output, childElement]
-  }, [])
+  vNode.children =
+    props.children === undefined
+      ? []
+      : processChildren(props.children, undefined, vNode)
+
+  // validate keys
+  const keys = vNode.children.map(child => child.key)
+  const uniqueKeys = _.union(keys)
+  const print = arr => console.error(arr.sort().join(', '))
+  if (keys.length !== uniqueKeys.length) {
+    console.error('key should be unique!')
+    print(uniqueKeys)
+    print(keys)
+  }
+
+  debugId++
+  return vNode
 }
 
-export const createVNode = (type, props, children) => {
-  // @ts-ignore
-  return new VNode({ type, props, children })
-}
-
-export const createTextVNode = (text, key) => {
-  // @ts-ignore
-  return new VNode({
+const createTextVNode = text => {
+  const vNode = new VNode({
     textContent: text,
-    key,
+    flag: FLAGS.TEXT,
   })
+  return vNode
+}
+
+const createFunctionVNode = (type, props) => {
+  const vNode = new VNode({
+    type,
+    props,
+    flag: FLAGS.FUNC,
+  })
+  return vNode
+}
+
+const createClassVNode = (type, props) => {
+  const vNode = new VNode({
+    type,
+    props,
+    flag: FLAGS.CLASS,
+  })
+  return vNode
+}
+
+const createElementVNode = (type, props) => {
+  let finalProps = props
+  let listeners = null
+  let attributes = null
+  const eventProps = _.pick(finalProps, REACT_EVENT_KEYS)
+  if (!_.isEmpty(eventProps)) {
+    listeners = _.reduce(
+      eventProps,
+      (listeners, handler, key) => {
+        const match = REACT_EVENT_MAP[key]
+        return {
+          ...listeners,
+          [match.key]: {
+            handler,
+            useCapture: match.useCapture,
+          },
+        }
+      },
+      {},
+    )
+    finalProps = _.omit(finalProps, _.keys(eventProps))
+  }
+  attributes = getAttrs(finalProps)
+  const vNode = new VNode({
+    type,
+    props: finalProps,
+    flag: FLAGS.ELEMENT,
+  })
+  vNode.listeners = listeners
+  vNode.attributes = attributes
+  return vNode
 }
