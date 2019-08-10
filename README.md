@@ -1,4 +1,4 @@
-# How react works
+# my-react
 
 ## Why creating this repo
 
