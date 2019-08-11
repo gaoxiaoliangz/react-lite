@@ -1,4 +1,4 @@
-# my-react
+# react-lite
 
 ## Why creating this repo
 
