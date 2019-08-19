@@ -1,7 +1,7 @@
 {
   "name": "how-react-works",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "start": "cd packages/example-simple && npm run start",
     "build": "cd packages/my-react && yarn build"
@@ -18,5 +18,8 @@
   "homepage": "https://github.com/gaoxiaoliangz/react-lite#readme",
   "devDependencies": {
     "lerna": "^3.4.3"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
