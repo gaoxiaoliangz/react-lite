@@ -1,5 +1,7 @@
 # react-lite
 
+A simple implementation of react
+
 ## Why creating this repo
 
 I want to understand how react works, the best way to do it is to implement it my own way.
